@@ -1,0 +1,56 @@
+<article
+    class="bg-gb-surface dark:bg-gb-dark-surface rounded-lg overflow-hidden border border-gb-border dark:border-gb-dark-border hover:border-gb-accent dark:hover:border-gb-accent transition-colors">
+
+    <!-- Thumbnail -->
+    <a href="#">
+        {% if post.featured_image %}
+        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover" />
+        {% else %}
+        <div class="w-full h-48 bg-gb-accent flex items-center justify-center">
+            <span class="text-4xl font-bold text-white opacity-40">
+                {{ post.title|first|upper }}
+            </span>
+        </div>
+        {% endif %}
+    </a>
+
+    <!-- Content -->
+    <div class="p-4 flex flex-col gap-3">
+
+        <!-- Category -->
+        {% if post.category %}
+        <span class="text-xs font-medium text-gb-accent uppercase tracking-wide">
+            {{ post.category.name }}
+        </span>
+        {% endif %}
+
+        <!-- Title -->
+        <a href="#">
+            <h2
+                class="font-bold text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors leading-snug">
+                {{ post.title }}
+            </h2>
+        </a>
+
+        <!-- Excerpt -->
+        <p class="text-sm text-gb-muted dark:text-gb-dark-muted leading-relaxed">
+            {{ post.body|truncatewords:20 }}
+        </p>
+
+        <!-- Author + Date -->
+        <div class="flex items-center gap-2 mt-auto pt-2 border-t border-gb-border dark:border-gb-dark-border">
+            <div
+                class="w-6 h-6 rounded-full bg-gb-accent flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                {{ post.author.get_full_name|first|upper|default:post.author.username|first|upper }}
+            </div>
+            <span class="text-xs text-gb-text dark:text-gb-dark-text font-medium">
+                {{ post.author.get_full_name|default:post.author.username }}
+            </span>
+            <span class="text-gb-muted dark:text-gb-dark-muted text-xs">·</span>
+            <span class="text-xs text-gb-muted dark:text-gb-dark-muted">
+                {{ post.created_at|date:"M j, Y" }}
+            </span>
+        </div>
+
+    </div>
+</article>

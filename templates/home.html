@@ -3,5 +3,13 @@
 {% block title %}Home — Logbook{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold">Hello, Logbook</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for post in posts %}
+    {% include "partials/post_card.html" %}
+  {% empty %}
+    <p class="text-gb-muted dark:text-gb-dark-muted col-span-3">No posts yet.</p>
+  {% endfor %}
+</div>
+
 {% endblock %}
