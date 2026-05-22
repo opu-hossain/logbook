@@ -3,6 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
 from taggit.managers import TaggableManager
+from markdownx.models import MarkdownxField
 
 # Create your models here.
 
@@ -23,7 +24,7 @@ class Post(models.Model):
 
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=100, unique=True)
-    body = models.TextField()
+    body = MarkdownxField()
 
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts"

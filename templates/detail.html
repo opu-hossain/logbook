@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load markdownify %}
+
+{% block title %}{{ post.title }} — Logbook{% endblock %}
+
+{% block content %}
+
+<article class="max-w-2xl mx-auto">
+
+    <!-- Category + Date -->
+    <div class="flex items-center gap-2 mb-4">
+        {% if post.category %}
+        <span class="text-xs font-medium text-gb-accent uppercase tracking-wide">
+            {{ post.category.name }}
+        </span>
+        <span class="text-gb-muted dark:text-gb-dark-muted text-sm">·</span>
+        {% endif %}
+        <span class="text-sm text-gb-muted dark:text-gb-dark-muted">
+            {{ post.created_at|date:"M j, Y" }}
+        </span>
+    </div>
+
+    <!-- Title -->
+    <h1 class="text-3xl font-bold text-gb-text dark:text-gb-dark-text leading-tight mb-4">
+        {{ post.title }}
+    </h1>
+
+    <!-- Author -->
+    <div class="flex items-center gap-2 mb-8 pb-6 border-b border-gb-border dark:border-gb-dark-border">
+        <div class="w-8 h-8 rounded-full bg-gb-accent flex items-center justify-center text-sm font-bold text-white">
+            {{ post.author.get_full_name|first|upper|default:post.author.username|first|upper }}
+        </div>
+        <span class="text-sm font-medium text-gb-text dark:text-gb-dark-text">
+            {{ post.author.get_full_name|default:post.author.username }}
+        </span>
+    </div>
+
+    <!-- Featured image -->
+    {% if post.featured_image %}
+    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}"
+        class="w-full rounded-lg mb-8 object-cover max-h-96" />
+    {% endif %}
+
+    <!-- Body -->
+    <div class="prose prose-gruvbox max-w-none text-gb-text dark:text-gb-dark-text">
+        {{ post.body|markdownify }}
+    </div>
+
+    <!-- Tags -->
+    {% if post.tags.all %}
+    <div class="flex flex-wrap gap-2 mt-10 pt-6 border-t border-gb-border dark:border-gb-dark-border">
+        {% for tag in post.tags.all %}
+        <span
+            class="text-xs px-3 py-1 rounded-full bg-gb-surface dark:bg-gb-dark-surface text-gb-muted dark:text-gb-dark-muted">
+            #{{ tag.name }}
+        </span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</article>
+
+{% endblock %}

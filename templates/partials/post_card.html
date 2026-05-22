@@ -2,7 +2,7 @@
     class="bg-gb-surface dark:bg-gb-dark-surface rounded-lg overflow-hidden border border-gb-border dark:border-gb-dark-border hover:border-gb-accent dark:hover:border-gb-accent transition-colors">
 
     <!-- Thumbnail -->
-    <a href="#">
+    <a href="{% url 'post_detail' post.slug %}">
         {% if post.featured_image %}
         <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover" />
         {% else %}
@@ -25,7 +25,7 @@
         {% endif %}
 
         <!-- Title -->
-        <a href="#">
+        <a href="{% url 'post_detail' post.slug %}">
             <h2
                 class="font-bold text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors leading-snug">
                 {{ post.title }}
