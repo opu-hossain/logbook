@@ -1,5 +1,6 @@
 asgiref==3.11.1
 Django==5.2.14
+django-storages==1.14.6
 django-taggit==6.1.0
 greenlet==3.5.1
 numpy==2.4.6
