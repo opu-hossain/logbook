@@ -1,0 +1,108 @@
+<nav
+  class="w-full border-b border-gb-border dark:border-gb-dark-border bg-gb-bg dark:bg-gb-dark-bg sticky top-0 z-50 transition-colors duration-200"
+  x-data="{ open: false, dark: document.documentElement.classList.contains('dark') }"
+>
+  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+    <!-- Logo -->
+    <a
+      href="/"
+      class="text-xl font-bold tracking-tight text-gb-accent hover:text-gb-accent-hover transition-colors"
+    >
+      Logbook
+    </a>
+
+    <!-- Desktop nav -->
+    <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+      <a
+        href="/"
+        class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors"
+        >Home</a
+      >
+      <a
+        href="/blog/"
+        class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors"
+        >Blog</a
+      >
+
+      <!-- Theme toggle -->
+      <button
+        @click="
+          dark = !dark;
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.classList.toggle('light', !dark);
+          localStorage.setItem('theme', dark ? 'dark' : 'light');
+        "
+        class="text-gb-muted dark:text-gb-dark-muted hover:text-gb-accent dark:hover:text-gb-accent transition-colors"
+        :title="dark ? 'Switch to light' : 'Switch to dark'"
+      >
+        <span x-show="!dark">🌙</span>
+        <span x-show="dark">☀️</span>
+      </button>
+    </div>
+
+    <!-- Mobile: theme toggle + hamburger -->
+    <div class="flex md:hidden items-center gap-3">
+      <button
+        @click="
+          dark = !dark;
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.classList.toggle('light', !dark);
+          localStorage.setItem('theme', dark ? 'dark' : 'light');
+        "
+        class="text-gb-muted dark:text-gb-dark-muted"
+      >
+        <span x-show="!dark">🌙</span>
+        <span x-show="dark">☀️</span>
+      </button>
+
+      <button @click="open = !open" class="text-gb-text dark:text-gb-dark-text">
+        <svg
+          x-show="!open"
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+        <svg
+          x-show="open"
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div
+    x-show="open"
+    x-transition
+    class="md:hidden border-t border-gb-border dark:border-gb-dark-border px-4 py-3 flex flex-col gap-3 text-sm font-medium"
+  >
+    <a
+      href="/"
+      class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors"
+      >Home</a
+    >
+    <a
+      href="/blog/"
+      class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors"
+      >Blog</a
+    >
+  </div>
+</nav>

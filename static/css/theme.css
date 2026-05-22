@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@source "../..";
+
 @theme {
   /* Gruvbox Light */
   --color-gb-bg: #fbf1c7;

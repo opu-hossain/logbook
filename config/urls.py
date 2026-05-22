@@ -22,17 +22,9 @@ from django.shortcuts import render
 from django.conf import settings
 from django.conf.urls.static import static
 
-
-def testView(request):
-    return render(request, "base.html")
-
-
-def htmxTest(request):
-    return HttpResponse("<p>HTMX works</p>")
-
+from apps.blog.views import home
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", testView),
-    path("htmx-test/", htmxTest),
+    path("", home, name="home"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
