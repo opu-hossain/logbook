@@ -3,7 +3,7 @@ from pathlib import Path
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-# ^^^ three .parent because we're now 3 levels deep: settings/base.py → settings/ → config/ → root
+# ^^^ three .parent because this file is now 3 levels deep: settings/base.py → settings/ → config/ → root
 
 SECRET_KEY = config("SECRET_KEY")
 
@@ -14,8 +14,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # third party (add as you install)
-    # local apps (add as you create them)
+    # apps
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
@@ -33,7 +33,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # <-- root templates folder
+        "DIRS": [BASE_DIR / "templates"],  # root templates folder
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -56,6 +56,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+AUTH_USER_MODEL = "accounts.User"
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Dhaka"
