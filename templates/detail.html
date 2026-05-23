@@ -42,8 +42,21 @@
     {% endif %}
 
     <!-- Body -->
-    <div class="prose prose-gruvbox max-w-none text-gb-text dark:text-gb-dark-text">
-        {{ post.body|markdownify }}
+    <div class="prose prose-gruvbox max-w-none 
+      prose-headings:text-gb-text dark:prose-headings:text-gb-dark-text
+      prose-p:text-gb-text dark:prose-p:text-gb-dark-text
+      prose-strong:text-gb-text dark:prose-strong:text-gb-dark-text
+      prose-a:text-gb-accent
+      prose-blockquote:text-gb-muted dark:prose-blockquote:text-gb-dark-muted
+      prose-blockquote:border-gb-accent
+      prose-code:text-gb-yellow
+      prose-pre:bg-gb-surface dark:prose-pre:bg-gb-dark-surface
+      prose-li:text-gb-text dark:prose-li:text-gb-dark-text
+      prose-hr:border-gb-border dark:prose-hr:border-gb-dark-border
+      prose-th:text-gb-text dark:prose-th:text-gb-dark-text
+      prose-td:text-gb-text dark:prose-td:text-gb-dark-text"
+
+      >{{ post.body|markdownify }}
     </div>
 
     <!-- Tags -->

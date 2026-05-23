@@ -81,6 +81,11 @@ MARKDOWNX_EDITOR_RESIZABLE = False
 
 MARKDOWNIFY = {
     "default": {
+        "MARKDOWN_EXTENSIONS": [
+            "markdown.extensions.tables",
+            "markdown.extensions.fenced_code",
+            "markdown.extensions.extra",
+        ],
         "WHITELIST_TAGS": [
             "a",
             "abbr",
@@ -105,6 +110,12 @@ MARKDOWNIFY = {
             "hr",
             "br",
             "img",
-        ]
+            "table",
+            "thead",
+            "tbody",
+            "tr",
+            "th",
+            "td",
+        ],
     }
 }
