@@ -78,3 +78,33 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MARKDOWNX_EDITOR_RESIZABLE = False
+
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": [
+            "a",
+            "abbr",
+            "acronym",
+            "b",
+            "blockquote",
+            "code",
+            "em",
+            "i",
+            "li",
+            "ol",
+            "p",
+            "pre",
+            "strong",
+            "ul",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "hr",
+            "br",
+            "img",
+        ]
+    }
+}

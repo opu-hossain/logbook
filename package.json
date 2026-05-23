@@ -22,6 +22,7 @@
   "homepage": "https://github.com/opu-hossain/logbook#readme",
   "dependencies": {
     "@tailwindcss/cli": "^4.3.0",
+    "@tailwindcss/typography": "^0.5.19",
     "tailwindcss": "^4.3.0"
   }
 }
