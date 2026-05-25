@@ -9,6 +9,18 @@
     <p class="text-gb-muted dark:text-gb-dark-muted mt-1 text-sm">All posts, latest first.</p>
 </div>
 
+<!-- Category filter -->
+{% if categories %}
+<div class="flex flex-wrap gap-2 mb-8">
+    <a href="/blog/"
+        class="px-3 py-1 text-xs rounded-full border transition-colors {% if not active_category %}border-gb-accent text-gb-accent{% else %}border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:border-gb-accent hover:text-gb-accent{% endif %}">All</a>
+    {% for category in categories %}
+    <a href="/blog/?category={{ category.slug }}"
+        class="px-3 py-1 text-xs rounded-full border transition-colors {% if active_category.slug == category.slug %}border-gb-accent text-gb-accent{% else %}border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:border-gb-accent hover:text-gb-accent{% endif %}">{{category.name}}</a>
+    {% endfor %}
+</div>
+{% endif %}
+
 <!-- Post grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for post in page_obj %}
