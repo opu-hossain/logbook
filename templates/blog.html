@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Blog — Logbook{% endblock %}
+
+{% block content %}
+
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gb-text dark:text-gb-dark-text">Blog</h1>
+    <p class="text-gb-muted dark:text-gb-dark-muted mt-1 text-sm">All posts, latest first.</p>
+</div>
+
+<!-- Post grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for post in page_obj %}
+    {% include "partials/post_card.html" %}
+    {% empty %}
+    <p class="text-gb-muted dark:text-gb-dark-muted col-span-3">No posts yet.</p>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="flex items-center justify-center gap-2 mt-10">
+
+    {% if page_obj.has_previous %}
+
+    <a href="?page={{ page_obj.previous_page_number }}"
+        class="px-4 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">
+        ← Prev
+    </a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.number == num %}
+    <span class="px-4 py-2 text-sm rounded border border-gb-accent text-gb-accent font-bold">
+        {{ num }}
+    </span>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a href="?page={{ num }}"
+        class="px-4 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">
+        {{ num }}
+        </a>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+            class="px-4 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">
+            Next →
+        </a>
+        {% endif %}
+
+</div>
+{% endif %}
+
+{% endblock %}

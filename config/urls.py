@@ -22,11 +22,12 @@ from django.shortcuts import render
 from django.conf import settings
 from django.conf.urls.static import static
 
-from apps.blog.views import home, post_detail
+from apps.blog.views import home, post_detail, blog
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home, name="home"),
+    path("blog/", blog, name="blog"),
     path("markdownx/", include("markdownx.urls")),
     path("post/<slug:slug>/", post_detail, name="post_detail"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
