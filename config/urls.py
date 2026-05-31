@@ -20,6 +20,7 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
+from apps.blog.feeds import LatestPostsFeed
 from apps.blog.views import home, post_detail, blog, search
 
 urlpatterns = [
@@ -29,4 +30,5 @@ urlpatterns = [
     path("markdownx/", include("markdownx.urls")),
     path("post/<slug:slug>/", post_detail, name="post_detail"),
     path("search/", search, name="search"),
+    path("feed/", LatestPostsFeed(), name="feed"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
