@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Search — Logbook{% endblock %}
+
+{% block content %}
+
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gb-text dark:text-gb-dark-text">Search</h1>
+    {% if query %}
+    <p class="text-gb-muted dark:text-gb-dark-muted mt-1 text-sm">Results for "<span class="text-gb-accent">{{ query
+            }}</span>" — {{ results|length }} found</p>
+    {% endif %}
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for post in results %}
+    {% include "partials/post_card.html" %}
+    {% empty %}
+    {% if query %}
+    <p class="text-gb-muted dark:text-gb-dark-muted col-span-3">No posts found for "{{ query }}".</p>
+    {% else %}
+    <p class="text-gb-muted dark:text-gb-dark-muted col-span-3">Enter a search term above to find posts.</p>
+    {% endif %}
+    {% endfor %}
+</div>
+
+{% endblock %}

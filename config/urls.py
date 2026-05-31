@@ -17,12 +17,10 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-from django.http import HttpResponse
-from django.shortcuts import render
 from django.conf import settings
 from django.conf.urls.static import static
 
-from apps.blog.views import home, post_detail, blog
+from apps.blog.views import home, post_detail, blog, search
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,4 +28,5 @@ urlpatterns = [
     path("blog/", blog, name="blog"),
     path("markdownx/", include("markdownx.urls")),
     path("post/<slug:slug>/", post_detail, name="post_detail"),
+    path("search/", search, name="search"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

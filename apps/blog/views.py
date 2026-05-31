@@ -1,7 +1,7 @@
-from django.core import paginator
 from django.shortcuts import get_object_or_404, render
 from .models import Category, Post
 from django.core.paginator import Paginator
+from django.db import models
 
 # Create your views here.
 
@@ -38,3 +38,15 @@ def blog(request):
             "active_category": active_category,
         },
     )
+
+
+def search(request):
+    query = request.GET.get("q", "")
+    results = []
+    if query:
+        results = (
+            Post.objects.filter(status=Post.Status.PUBLISHED)
+            .filter(models.Q(title__icontains=query) | models.Q(body__icontains=query))
+            .order_by("-created_at")
+        )
+        return render(request, "search.html", {"results": results, "query": query})
