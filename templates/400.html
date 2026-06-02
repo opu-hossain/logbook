@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}400 — Bad Request{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center py-20 text-center">
+    <h1 class="text-8xl font-bold text-gb-accent mb-4">400</h1>
+    <h2 class="text-2xl font-bold text-gb-text dark:text-gb-dark-text mb-2">Bad Request</h2>
+    <p class="text-gb-muted dark:text-gb-dark-muted mb-8">The server couldn't understand your request.</p>
+    <a href="/"
+        class="px-6 py-2 rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors text-sm font-medium">Back
+        to Home</a>
+</div>
+{% endblock %}
