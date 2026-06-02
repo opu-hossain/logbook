@@ -19,9 +19,13 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
 
 from apps.blog.feeds import LatestPostsFeed
 from apps.blog.views import home, post_detail, blog, search
+from apps.blog.sitemaps import PostSitemap
+
+sitemaps = {"posts": PostSitemap}
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -31,4 +35,10 @@ urlpatterns = [
     path("post/<slug:slug>/", post_detail, name="post_detail"),
     path("search/", search, name="search"),
     path("feed/", LatestPostsFeed(), name="feed"),
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
