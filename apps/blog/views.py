@@ -49,10 +49,9 @@ def search(request):
             .filter(models.Q(title__icontains=query) | models.Q(body__icontains=query))
             .order_by("-created_at")
         )
-        # Add debug print
-        print(f"Query: {query}, Results count: {results.count()}")
-        for post in results:
-            print(f"  - {post.title}")
+        # print(f"Query: {query}, Results count: {results.count()}")
+        # for post in results:
+        #    print(f"  - {post.title}")
 
     if request.headers.get("HX-Request"):
         return render(
