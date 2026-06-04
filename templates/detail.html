@@ -73,4 +73,39 @@
 
 </article>
 
+<!-- Comments section -->
+<section class="mt-12 pt-8 border-t border-gb-border dark:border-gb-dark-border">
+
+  <h2 class="text-xl font-bold text-gb-text dark:text-gb-dark-text mb-6">
+    Comments ({{ comments.count }})
+  </h2>
+
+  <!-- Approved comments -->
+  {% if comments %}
+  <div class="flex flex-col gap-6 mb-10">
+    {% for comment in comments %}
+    <div class="flex gap-4">
+      <div class="w-8 h-8 rounded-full bg-gb-accent flex items-center justify-center text-sm font-bold text-white flex-shrink-0">{{ comment.name|first|upper }}</div>
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-sm font-medium text-gb-text dark:text-gb-dark-text">{{ comment.name }}</span>
+          <span class="text-xs text-gb-muted dark:text-gb-dark-muted">{{ comment.created_at|date:"M j, Y" }}</span>
+        </div>
+        <p class="text-sm text-gb-text dark:text-gb-dark-text leading-relaxed">{{ comment.body }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-gb-muted dark:text-gb-dark-muted text-sm mb-10">No comments yet. Be the first!</p>
+  {% endif %}
+
+  <!-- Comment form -->
+  <h3 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-4">Leave a Comment</h3>
+  <div id="comment-form-wrapper">
+    {% include "partials/comment_form.html" %}
+  </div>
+
+</section>
+
 {% endblock %}

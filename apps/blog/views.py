@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render
-from .models import Category, Post
+from .models import Category, Post, Comment
+from .forms import CommentForm
 from django.core.paginator import Paginator
 from django.db import models
 
@@ -13,7 +14,26 @@ def home(request):
 
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug, status=Post.Status.PUBLISHED)
-    return render(request, "detail.html", {"post": post})
+    comments = post.comments.filter(approved=True)
+    form = CommentForm()
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            if request.headers.get("HX-Request"):
+                return render(request, "partials/comment_success.html")
+        else:
+            if request.headers.get("HX-Request"):
+                return render(
+                    request, "partials/comment_form.html", {"form": form, "post": post}
+                )
+
+    return render(
+        request, "detail.html", {"post": post, "comments": comments, "form": form}
+    )
 
 
 def blog(request):

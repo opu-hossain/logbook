@@ -1,0 +1,27 @@
+<form hx-post="{% url 'post_detail' post.slug %}" hx-target="#comment-form-wrapper" hx-swap="innerHTML"
+    class="flex flex-col gap-4" id="comment-form">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <p class="text-xs text-gb-red mt-1">{{ form.name.errors.0 }}</p>
+            {% endif %}
+        </div>
+        <div>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <p class="text-xs text-gb-red mt-1">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <div>
+        {{ form.body }}
+        {% if form.body.errors %}
+        <p class="text-xs text-gb-red mt-1">{{ form.body.errors.0 }}</p>
+        {% endif %}
+    </div>
+    <button type="submit"
+        class="self-start px-5 py-2 text-sm font-medium rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Post
+        Comment</button>
+</form>

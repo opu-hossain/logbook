@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Category
+from .models import Post, Category, Comment
 
 # Register models here.
 
@@ -11,5 +11,17 @@ class PostAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("name", "post", "created_at", "approved")
+    list_filter = "approved"
+    actions = "approve_comments"
+
+    def approve_comments(self, request, queryset):
+        queryset.update(approved=True)
+
+    approve_comments.short_description = "Approve selected comments"
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Category)
+admin.site.register(Comment)
