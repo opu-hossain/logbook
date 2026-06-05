@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Register — Logbook{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-10">
+    <div
+        class="w-full max-w-md bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-8">
+
+        <div class="mb-8 text-center">
+            <a href="/" class="text-2xl font-bold text-gb-accent">Logbook</a>
+            <h1 class="text-xl font-bold text-gb-text dark:text-gb-dark-text mt-2">Create an account</h1>
+            <p class="text-gb-muted dark:text-gb-dark-muted text-sm mt-1">Join Logbook to comment and save posts.</p>
+        </div>
+
+        <form method="post" class="flex flex-col gap-4">
+            {% csrf_token %}
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <p class="text-xs text-gb-red">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <p class="text-xs text-gb-red">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Password</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                <p class="text-xs text-gb-red">{{ form.password1.errors.0 }}</p>
+                {% else %}
+                <p class="text-xs text-gb-muted dark:text-gb-dark-muted">At least 8 characters.</p>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Confirm Password</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                <p class="text-xs text-gb-red">{{ form.password2.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit"
+                class="w-full py-2.5 text-sm font-semibold rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors mt-2">
+                Create Account
+            </button>
+
+        </form>
+
+        <p class="text-sm text-gb-muted dark:text-gb-dark-muted mt-6 text-center">
+            Already have an account?
+            <a href="{% url 'login' %}"
+                class="text-gb-accent hover:text-gb-accent-hover transition-colors font-medium">Log in</a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

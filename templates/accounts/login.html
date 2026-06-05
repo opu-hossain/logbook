@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Login — Logbook{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-10">
+    <div
+        class="w-full max-w-md bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-8">
+
+        <div class="mb-8 text-center">
+            <a href="/" class="text-2xl font-bold text-gb-accent">Logbook</a>
+            <h1 class="text-xl font-bold text-gb-text dark:text-gb-dark-text mt-2">Welcome back</h1>
+            <p class="text-gb-muted dark:text-gb-dark-muted text-sm mt-1">Log in to your Logbook account.</p>
+        </div>
+
+        <form method="post" class="flex flex-col gap-4">
+            {% csrf_token %}
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <p class="text-xs text-gb-red">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <p class="text-xs text-gb-red">{{ form.password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+            <p class="text-xs text-gb-red">{{ form.non_field_errors.0 }}</p>
+            {% endif %}
+
+            <button type="submit"
+                class="w-full py-2.5 text-sm font-semibold rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors mt-2">
+                Log In
+            </button>
+
+        </form>
+
+        <div class="flex items-center justify-between mt-6">
+            <p class="text-sm text-gb-muted dark:text-gb-dark-muted">
+                Don't have an account?
+                <a href="{% url 'register' %}"
+                    class="text-gb-accent hover:text-gb-accent-hover transition-colors font-medium">Register</a>
+            </p>
+            <a href="#"
+                class="text-sm text-gb-muted dark:text-gb-dark-muted hover:text-gb-accent transition-colors">Forgot
+                password?</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -35,6 +35,7 @@ urlpatterns = [
     path("post/<slug:slug>/", post_detail, name="post_detail"),
     path("search/", search, name="search"),
     path("feed/", LatestPostsFeed(), name="feed"),
+    path("auth/", include("apps.accounts.urls")),
     path(
         "sitemap.xml",
         sitemap,

@@ -24,6 +24,17 @@
                     class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors">Blog</a>
             </div>
 
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'logout' %}"
+                class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors">Logout</a>
+            <span class="text-gb-muted dark:text-gb-dark-muted text-sm">{{ request.user.username }}</span>
+            {% else %}
+            <a href="{% url 'login' %}"
+                class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors">Login</a>
+            <a href="{% url 'register' %}"
+                class="px-3 py-1 text-xs rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Register</a>
+            {% endif %}
+
             <!-- Search toggle -->
             <button @click="search = !search"
                 class="text-gb-muted dark:text-gb-dark-muted hover:text-gb-accent dark:hover:text-gb-accent transition-colors flex-shrink-0">
@@ -76,6 +87,17 @@
             <input type="text" name="q" placeholder="Search posts..."
                 class="w-full px-3 py-1.5 text-sm rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface text-gb-text dark:text-gb-dark-text focus:outline-none focus:border-gb-accent transition-colors" />
         </form>
+
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'logout' %}"
+            class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors">Logout</a>
+        <span class="text-gb-muted dark:text-gb-dark-muted text-sm">{{ request.user.username }}</span>
+        {% else %}
+        <a href="{% url 'login' %}"
+            class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors">Login</a>
+        <a href="{% url 'register' %}"
+            class="px-3 py-2 text-xs rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Register</a>
+        {% endif %}
     </div>
 
 </nav>
