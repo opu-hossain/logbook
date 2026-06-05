@@ -24,7 +24,15 @@ def post_detail(request, slug):
             comment.post = post
             comment.save()
             if request.headers.get("HX-Request"):
-                return render(request, "partials/comment_success.html")
+                return render(
+                    request,
+                    "partials/comment_success.html",
+                    {
+                        "post": post,
+                        "toast_message": "Comment submitted! Awaiting approval.",
+                        "toast_type": "success",
+                    },
+                )
         else:
             if request.headers.get("HX-Request"):
                 return render(
