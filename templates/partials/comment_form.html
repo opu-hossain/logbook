@@ -2,11 +2,15 @@
 <form hx-post="{% url 'post_detail' post.slug %}" hx-target="#comment-form-wrapper" hx-swap="innerHTML" class="flex flex-col gap-4" id="comment-form">
   {% csrf_token %}
 
-  <!-- Author info display -->
-  <div class="flex items-center gap-2 p-3 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface">
-    <div class="w-7 h-7 rounded-full bg-gb-accent flex items-center justify-center text-xs font-bold text-white flex-shrink-0">{{ user.get_full_name|first|upper|default:user.username|first|upper }}</div>
-    <span class="text-sm text-gb-text dark:text-gb-dark-text font-medium">Commenting as <span class="text-gb-accent">{{ user.get_full_name|default:user.username }}</span></span>
-  </div>
+     <!-- Author info display -->
+    <div class="flex items-center gap-2 p-3 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface">
+      {% if user.avatar %}
+      <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+      {% else %}
+      <div class="w-7 h-7 rounded-full bg-gb-accent flex items-center justify-center text-xs font-bold text-white flex-shrink-0">{{ user.get_full_name|first|upper|default:user.username|first|upper }}</div>
+      {% endif %}
+      <span class="text-sm text-gb-text dark:text-gb-dark-text font-medium">Commenting as <span class="text-gb-accent">{{ user.get_full_name|default:user.username }}</span></span>
+    </div>
 
   <div>
     {{ form.body }}
