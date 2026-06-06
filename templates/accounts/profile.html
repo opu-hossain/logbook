@@ -52,10 +52,10 @@
                 <div class="flex items-center gap-2 mt-2">
                     <span class="text-xs text-gb-muted dark:text-gb-dark-muted">On</span>
                     <a href="{% url 'post_detail' comment.post.slug %}"
-                        class="text-xs text-gb-accent hover:text-gb-accent-hover transition-colors">{{
-                        comment.post.title }}</a>
-                    <span class="text-xs text-gb-muted dark:text-gb-dark-muted">· {{ comment.created_at|date:"M j, Y"
-                        }}</span>
+                        class="text-xs text-gb-accent hover:text-gb-accent-hover transition-colors">
+                        {{comment.post.title}}</a>
+                    <span class="text-xs text-gb-muted dark:text-gb-dark-muted">·
+                        {{ comment.created_at|date:"M j, Y"}}</span>
                 </div>
             </div>
             {% endfor %}
