@@ -1,27 +1,28 @@
-<form hx-post="{% url 'post_detail' post.slug %}" hx-target="#comment-form-wrapper" hx-swap="innerHTML"
-    class="flex flex-col gap-4" id="comment-form">
-    {% csrf_token %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            {{ form.name }}
-            {% if form.name.errors %}
-            <p class="text-xs text-gb-red mt-1">{{ form.name.errors.0 }}</p>
-            {% endif %}
-        </div>
-        <div>
-            {{ form.email }}
-            {% if form.email.errors %}
-            <p class="text-xs text-gb-red mt-1">{{ form.email.errors.0 }}</p>
-            {% endif %}
-        </div>
-    </div>
-    <div>
-        {{ form.body }}
-        {% if form.body.errors %}
-        <p class="text-xs text-gb-red mt-1">{{ form.body.errors.0 }}</p>
-        {% endif %}
-    </div>
-    <button type="submit"
-        class="self-start px-5 py-2 text-sm font-medium rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Post
-        Comment</button>
+{% if user.is_authenticated %}
+<form hx-post="{% url 'post_detail' post.slug %}" hx-target="#comment-form-wrapper" hx-swap="innerHTML" class="flex flex-col gap-4" id="comment-form">
+  {% csrf_token %}
+
+  <!-- Author info display -->
+  <div class="flex items-center gap-2 p-3 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface">
+    <div class="w-7 h-7 rounded-full bg-gb-accent flex items-center justify-center text-xs font-bold text-white flex-shrink-0">{{ user.get_full_name|first|upper|default:user.username|first|upper }}</div>
+    <span class="text-sm text-gb-text dark:text-gb-dark-text font-medium">Commenting as <span class="text-gb-accent">{{ user.get_full_name|default:user.username }}</span></span>
+  </div>
+
+  <div>
+    {{ form.body }}
+    {% if form.body.errors %}
+    <p class="text-xs text-gb-red mt-1">{{ form.body.errors.0 }}</p>
+    {% endif %}
+  </div>
+
+  <button type="submit" class="self-start px-5 py-2 text-sm font-medium rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Post Comment</button>
 </form>
+{% else %}
+<div class="p-4 rounded border border-gb-border dark:border-gb-dark-border text-center">
+  <p class="text-gb-muted dark:text-gb-dark-muted text-sm mb-3">You need an account to comment.</p>
+  <div class="flex items-center justify-center gap-3">
+    <a href="{% url 'login' %}?next={{ request.path }}" class="px-4 py-2 text-sm font-medium rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors">Log In</a>
+    <a href="{% url 'register' %}" class="px-4 py-2 text-sm font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">Register</a>
+  </div>
+</div>
+{% endif %}

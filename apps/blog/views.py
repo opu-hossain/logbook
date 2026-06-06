@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from .models import Category, Post, Comment
 from .forms import CommentForm
 from django.core.paginator import Paginator
@@ -18,10 +18,15 @@ def post_detail(request, slug):
     form = CommentForm()
 
     if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect("login")
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
+            comment.author = request.user
+            comment.name = request.user.get_full_name() or request.user.username
+            comment.email = request.user.email
             comment.save()
             if request.headers.get("HX-Request"):
                 return render(
