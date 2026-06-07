@@ -31,7 +31,9 @@
             {{ post.author.get_full_name|first|upper|default:post.author.username|first|upper }}
         </div>
         <span class="text-sm font-medium text-gb-text dark:text-gb-dark-text">
-            {{ post.author.get_full_name|default:post.author.username }}
+          <a href="{% url 'author_profile' post.author.username %}" class="text-sm font-medium text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors">
+               {{ post.author.get_full_name|default:post.author.username }}
+          </a>
         </span>
     </div>
 

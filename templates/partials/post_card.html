@@ -44,7 +44,9 @@
                 {{ post.author.get_full_name|first|upper|default:post.author.username|first|upper }}
             </div>
             <span class="text-xs text-gb-text dark:text-gb-dark-text font-medium">
-                {{ post.author.get_full_name|default:post.author.username }}
+                <a href="{% url 'author_profile' post.author.username %}" class="text-xs font-medium text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors">
+                    {{ post.author.get_full_name|default:post.author.username }}
+                </a>
             </span>
             <span class="text-gb-muted dark:text-gb-dark-muted text-xs">·</span>
             <span class="text-xs text-gb-muted dark:text-gb-dark-muted">

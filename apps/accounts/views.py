@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from .forms import RegisterForm, ProfileEditForm
+from .models import User
+from apps.blog.models import Post
 
 # Create your views here.
 
@@ -25,6 +27,16 @@ def profile_edit_view(request):
     else:
         form = ProfileEditForm(instance=request.user)
     return render(request, "accounts/profile_edit.html", {"form": form})
+
+
+def author_profile_view(request, username):
+    author = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=author, status=Post.Status.PUBLISHED).order_by(
+        "-created_at"
+    )
+    return render(
+        request, "accounts/author_profile.html", {"author": author, "posts": posts}
+    )
 
 
 def register_view(request):
