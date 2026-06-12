@@ -123,7 +123,11 @@ def post_create(request):
             messages.error(request, "Please fix the errors!")
     else:
         form = PostForm()
-    return render(request, "post_create.html", {"form": form})
+    return render(
+        request,
+        "post_create.html",
+        {"form": form, "editor_mode": request.user.editor_preference},
+    )
 
 
 @login_required

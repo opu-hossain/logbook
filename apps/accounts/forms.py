@@ -23,7 +23,7 @@ class RegisterForm(UserCreationForm):
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "bio", "avatar"]
+        fields = ["first_name", "last_name", "bio", "avatar", "editor_preference"]
         widgets = {
             "first_name": forms.TextInput(
                 attrs={
@@ -39,6 +39,11 @@ class ProfileEditForm(forms.ModelForm):
                 attrs={
                     "rows": 4,
                     "class": "w-full px-3 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface text-gb-text dark:text-gb-dark-text focus:outline-none focus:border-gb-accent transition-colors resize-none",
+                }
+            ),
+            "editor_preference": forms.Select(
+                attrs={
+                    "class": "w-full px-3 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface text-gb-text dark:text-gb-dark-text focus:outline-none focus:border-gb-accent transition-colors"
                 }
             ),
         }

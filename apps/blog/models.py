@@ -33,6 +33,11 @@ class Post(models.Model):
     content_type = models.CharField(
         max_length=10, choices=ContentType.choices, default=ContentType.MARKDOWN
     )
+    editor_preference = models.CharField(
+        max_length=10,
+        choices=[("html", "Visual editor"), ("markdown", "Markdown")],
+        default="html",
+    )
 
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts"
