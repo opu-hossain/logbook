@@ -22,9 +22,17 @@ class Post(models.Model):
         PUBLISHED = "PB", "Published"
         ARCHIVED = "AR", "Archived"
 
+    class ContentType(models.TextChoices):
+        MARKDOWN = "markdown", "Markdown"
+        HTML = "html", "Rich HTML"
+
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=100, unique=True)
     body = MarkdownxField()
+
+    content_type = models.CharField(
+        max_length=10, choices=ContentType.choices, default=ContentType.MARKDOWN
+    )
 
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts"

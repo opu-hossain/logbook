@@ -23,7 +23,16 @@ from django.contrib.sitemaps.views import sitemap
 from django.contrib.auth import views as auth_views
 
 from apps.blog.feeds import LatestPostsFeed
-from apps.blog.views import home, post_detail, blog, search
+from apps.blog.views import (
+    home,
+    post_detail,
+    blog,
+    search,
+    post_create,
+    post_edit,
+    image_upload,
+    draft_autosave,
+)
 from apps.blog.sitemaps import PostSitemap
 
 sitemaps = {"posts": PostSitemap}
@@ -74,4 +83,9 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    # post for users
+    path("write/", post_create, name="post_create"),
+    path("post/<slug:slug>/edit/", post_edit, name="post_edit"),
+    path("api/upload-image/", image_upload, name="image_upload"),
+    path("apit/draft/autosave/", draft_autosave, name="draft_autosave"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,8 +1,17 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Category, Post, Comment
+from .models import Category, Post
 from .forms import CommentForm
 from django.core.paginator import Paginator
 from django.db import models
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import JsonResponse, request
+from django.views.decorators.http import require_POST
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import json
+
+from .forms import CommentForm, PostForm
 
 # Create your views here.
 
@@ -97,3 +106,85 @@ def search(request):
         )
 
     return render(request, "search.html", {"results": results, "query": query})
+
+
+@login_required
+def post_create(request):
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            form.save_m2m()
+            messages.success(request, "Post published successfully!")
+            return redirect("post_details", slug=post.slug)
+        else:
+            messages.error(request, "Please fix the errors!")
+    else:
+        form = PostForm()
+    return render(request, "post_create.html", {"form": form})
+
+
+@login_required
+def post_edit(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.save()
+            form.save_m2m()
+            messages.success(request, "Post updated successfully!")
+            return redirect("post_detail", slug=post.slug)
+        else:
+            messages.error(request, "Please fix the errors below.")
+    else:
+        form = PostForm(instance=post)
+    return render(request, "post_create.html", {"form": form, "post": post})
+
+
+@login_required
+@require_POST
+def image_upload(request):
+    image = request.FILES.get("image")
+    if not image:
+        return JsonResponse({"error": "No image provided."}, status=400)
+
+    path = default_storage.save(f"post_images/{image.name}", ContentFile(image.read()))
+    url = request.build_absolute_uri(f"/media/{path}")
+    return JsonResponse({"url": url})
+
+
+@login_required
+@require_POST
+def draft_autosave(request):
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+    slug = data.get("slug")
+    body = data.get("body", "")
+    content_type = data.get("content_type", "markdown")
+
+    if slug:
+        post = get_object_or_404(Post, slug=slug, author=request.user)
+        post.body = body
+        post.content_type = content_type
+        post.status = Post.Status.DRAFT
+        post.save(update_fields=["body", "content_type", "status", "updated_at"])
+        return JsonResponse({"status": "saved", "slug": post.slug})
+    else:
+        title = data.get("title", "").strip()
+        if not title:
+            return JsonResponse({"status": "skipped", "reason": "no title yet"})
+
+        post = Post.objects.create(
+            title=title,
+            body=body,
+            content_type=content_type,
+            author=request.user,
+            status=Post.Status.DRAFT,
+        )
+        return JsonResponse({"status": "saved", "slug": post.slug})

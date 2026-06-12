@@ -58,7 +58,12 @@
           prose-hr:border-gb-border dark:prose-hr:border-gb-dark-border
           prose-th:text-gb-text dark:prose-th:text-gb-dark-text
           prose-td:text-gb-text dark:prose-td:text-gb-dark-text"
-      >{{ post.body|markdownify }}
+      >
+      {% if post.content_type == 'html' %}
+        {{ post.body|safe }}
+      {% else %}
+        {{ post.body|markdownify }}
+      {% endif %}
     </div>
 
     <!-- Tags -->

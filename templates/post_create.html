@@ -1,0 +1,577 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if post %}Edit — {{ post.title }}{% else %}Write — Logbook{% endif %}{% endblock %}
+
+{% block content %}
+{# Override base max-w-4xl for this page only — editors need full width #}
+<style>
+    /* Tiptap editor styles */
+    .tiptap-editor {
+        min-height: 480px;
+        outline: none;
+    }
+
+    .tiptap-editor p {
+        margin-bottom: 0.75rem;
+    }
+
+    .tiptap-editor h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 1.25rem 0 0.5rem;
+    }
+
+    .tiptap-editor h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 1.1rem 0 0.5rem;
+    }
+
+    .tiptap-editor h3 {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin: 1rem 0 0.4rem;
+    }
+
+    .tiptap-editor ul {
+        list-style: disc;
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .tiptap-editor ol {
+        list-style: decimal;
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .tiptap-editor blockquote {
+        border-left: 3px solid #d79921;
+        padding-left: 1rem;
+        color: #a89984;
+        font-style: italic;
+        margin: 1rem 0;
+    }
+
+    .tiptap-editor pre {
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        border-radius: 6px;
+        padding: 1rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+    }
+
+    .tiptap-editor code:not(pre code) {
+        background: #3c3836;
+        padding: 0.15em 0.4em;
+        border-radius: 4px;
+        font-size: 0.875em;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tiptap-editor a {
+        color: #458588;
+        text-decoration: underline;
+    }
+
+    .tiptap-editor img {
+        max-width: 100%;
+        border-radius: 6px;
+        margin: 0.75rem 0;
+    }
+
+    .tiptap-editor hr {
+        border: none;
+        border-top: 1px solid #3c3836;
+        margin: 1.5rem 0;
+    }
+
+    /* Toolbar button active state */
+    .toolbar-btn.is-active {
+        background: #3c3836;
+        color: #d79921;
+    }
+
+    /* Autosave dot pulse */
+    @keyframes pulse-dot {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+    }
+
+    .saving-dot {
+        animation: pulse-dot 1s ease-in-out infinite;
+    }
+</style>
+
+<div class="w-full max-w-none -mx-4 px-4 sm:px-6 lg:px-8">
+
+    <!--Top bar: breadcrumb + autosave status-->
+    <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
+        <div class="flex items-center gap-2 text-sm text-gb-muted dark:text-gb-dark-muted">
+            <a href="{% url 'blog' %}" class="hover:text-gb-accent transition-colors">Blog</a>
+            <span>/</span>
+            <span class="text-gb-text dark:text-gb-dark-text font-medium">
+                {% if post %}Edit post{% else %}New post{% endif %}
+            </span>
+        </div>
+
+        <!--Autosave status indicator-->
+        <div id="autosave-status"
+            class="flex items-center gap-2 text-xs text-gb-muted dark:text-gb-dark-muted opacity-0 transition-opacity duration-300">
+            <span id="autosave-dot" class="w-1.5 h-1.5 rounded-full bg-gb-yellow inline-block"></span>
+            <span id="autosave-text">Draft saved</span>
+        </div>
+    </div>
+
+    <!--Main layout: editor + sidebar-->
+    <form method="post" enctype="multipart/form-data" id="post-form"
+        class="flex flex-col xl:flex-row gap-6 items-start">
+        {% csrf_token %}
+
+        <!-- Left: Editor column -->
+        <div class="flex-1 min-w-0 flex flex-col gap-4">
+
+            <!--Title-->
+            <div class="flex flex-col gap-1.5">
+                {{ form.title }}
+                {% if form.title.errors %}
+                <p class="text-xs text-gb-red">{{ form.title.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!--Editor card-->
+            <div
+                class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg overflow-hidden">
+
+                <!--Editor toggle + toolbar row-->
+                <div
+                    class="flex items-center gap-0 border-b border-gb-border dark:border-gb-dark-border px-3 py-2 flex-wrap gap-y-2">
+
+                    <!--Mode toggle-->
+                    <div
+                        class="flex items-center rounded overflow-hidden border border-gb-border dark:border-gb-dark-border text-xs font-medium mr-4 shrink-0">
+                        <button type="button" id="btn-rich"
+                            class="px-3 py-1.5 transition-colors bg-gb-accent text-white"
+                            onclick="switchEditor('html')">
+                            ✦ Visual
+                        </button>
+                        <button type="button" id="btn-md"
+                            class="px-3 py-1.5 transition-colors bg-transparent text-gb-muted dark:text-gb-dark-muted hover:text-gb-text dark:hover:text-gb-dark-text"
+                            onclick="switchEditor('markdown')">
+                            ⌗ Markdown
+                        </button>
+                    </div>
+
+                    <!--Tiptap toolbar — hidden in markdown mode-->
+                    <div id="tiptap-toolbar" class="flex items-center gap-0.5 flex-wrap">
+                        <button type="button" onclick="execCmd('bold')" title="Bold"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs font-bold text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors"><b>B</b></button>
+                        <button type="button" onclick="execCmd('italic')" title="Italic"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs font-bold text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors"><i>I</i></button>
+                        <button type="button" onclick="execCmd('strike')" title="Strikethrough"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs font-bold text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors"><s>S</s></button>
+                        <button type="button" onclick="execCmd('code')" title="Inline code"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs font-mono  text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">&lt;&gt;</button>
+                        <div class="w-px h-4 bg-gb-border dark:bg-gb-dark-border mx-1"></div>
+                        <button type="button" onclick="execCmd('h1')" title="Heading 1"
+                            class="toolbar-btn px-2 h-7 flex items-center justify-center rounded text-xs font-bold text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">H1</button>
+                        <button type="button" onclick="execCmd('h2')" title="Heading 2"
+                            class="toolbar-btn px-2 h-7 flex items-center justify-center rounded text-xs font-bold text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">H2</button>
+                        <button type="button" onclick="execCmd('h3')" title="Heading 3"
+                            class="toolbar-btn px-2 h-7 flex items-center justify-center rounded text-xs font-bold text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">H3</button>
+                        <div class="w-px h-4 bg-gb-border dark:bg-gb-dark-border mx-1"></div>
+                        <button type="button" onclick="execCmd('bulletList')" title="Bullet list"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">≡</button>
+                        <button type="button" onclick="execCmd('orderedList')" title="Numbered list"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">1.</button>
+                        <button type="button" onclick="execCmd('blockquote')" title="Blockquote"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs text-gb-yellow hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">"</button>
+                        <button type="button" onclick="execCmd('codeBlock')" title="Code block"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs font-mono text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">{}</button>
+                        <button type="button" onclick="execCmd('hr')" title="Divider"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs text-gb-text dark:text-gb-dark-text hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">—</button>
+                        <div class="w-px h-4 bg-gb-border dark:bg-gb-dark-border mx-1"></div>
+                        <button type="button" onclick="execCmd('link')" title="Link"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs text-gb-blue hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">⇱</button>
+                        <button type="button" onclick="triggerImageUpload()" title="Insert image"
+                            class="toolbar-btn w-7 h-7 flex items-center justify-center rounded text-xs text-gb-green hover:bg-gb-border dark:hover:bg-gb-dark-border transition-colors">⊞</button>
+                        <input type="file" id="tiptap-image-input" accept="image/*" class="hidden"
+                            onchange="uploadInlineImage(this)">
+                    </div>
+
+                </div><!--end toolbar row-->
+
+                <!--Editor area-->
+                <div class="p-4 sm:p-6">
+
+                    <!--Tiptap editable div-->
+                    <div id="tiptap-editor" class="tiptap-editor text-gb-text dark:text-gb-dark-text focus:outline-none"
+                        contenteditable="true" data-placeholder="Start writing your post...">
+                    </div>
+
+                    <!--Markdown textarea — shown in markdown mode-->
+                    <div id="markdown-editor-wrap" class="hidden">
+                        {{ form.body }}
+                        <!--markdownx preview pane injected by markdownx JS below the textarea-->
+                    </div>
+
+                </div>
+
+                <!--hidden body + content_type fields always in DOM-->
+                <input type="hidden" id="id_content_type" name="content_type" value="html">
+            </div><!--end editor card-->
+
+            {% if form.body.errors %}
+            <p class="text-xs text-gb-red">{{ form.body.errors.0 }}</p>
+            {% endif %}
+
+        </div><!--end left column-->
+
+
+        <!--RIGHT: Sidebar-->
+        <aside class="w-full xl:w-72 shrink-0 flex flex-col gap-4">
+
+            <!--Publish card-->
+            <div
+                class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-4 flex flex-col gap-3">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted">
+                    Publish</h3>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-medium text-gb-text dark:text-gb-dark-text">Status</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                    <p class="text-xs text-gb-red">{{ form.status.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit"
+                    class="w-full py-2 text-sm font-semibold rounded bg-gb-accent text-white hover:opacity-90 active:scale-95 transition-all">
+                    {% if post %}Update post{% else %}Publish post{% endif %}
+                </button>
+
+                {% if post %}
+                <a href="{% url 'post_detail' post.slug %}"
+                    class="w-full py-2 text-sm font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:text-gb-text dark:hover:text-gb-dark-text transition-colors text-center">
+                    View post ↗
+                </a>
+                {% endif %}
+            </div>
+
+            <!--Category card-->
+            <div
+                class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-4 flex flex-col gap-3">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted">
+                    Category</h3>
+                {{ form.category }}
+                {% if form.category.errors %}
+                <p class="text-xs text-gb-red">{{ form.category.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!--Tags card-->
+            <div
+                class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-4 flex flex-col gap-3">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted">Tags
+                </h3>
+                <div class="flex flex-col gap-1.5">
+                    <!--taggit renders a plain text input — style it directly-->
+                    <div id="tags-wrapper">{{ form.tags }}</div>
+                    <p class="text-xs text-gb-muted dark:text-gb-dark-muted">Comma-separated. e.g. django, python, web
+                    </p>
+                </div>
+            </div>
+
+            <!--Featured image card-->
+            <div
+                class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-4 flex flex-col gap-3">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted">
+                    Featured Image</h3>
+                {% if post and post.featured_image %}
+                <img src="{{ post.featured_image.url }}" alt="Current featured image"
+                    class="w-full h-32 object-cover rounded border border-gb-border dark:border-gb-dark-border">
+                <p class="text-xs text-gb-muted dark:text-gb-dark-muted">Upload a new image to replace.</p>
+                {% endif %}
+                {{ form.featured_image }}
+                {% if form.featured_image.errors %}
+                <p class="text-xs text-gb-red">{{ form.featured_image.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!--SEO card-->
+            <div
+                class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-4 flex flex-col gap-3">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted">SEO
+                </h3>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-medium text-gb-text dark:text-gb-dark-text">Meta description</label>
+                    {{ form.meta_description }}
+                    <div class="flex justify-between">
+                        {% if form.meta_description.errors %}
+                        <p class="text-xs text-gb-red">{{ form.meta_description.errors.0 }}</p>
+                        {% else %}
+                        <p class="text-xs text-gb-muted dark:text-gb-dark-muted">Shown in search results.</p>
+                        {% endif %}
+                        <span id="meta-char-count"
+                            class="text-xs text-gb-muted dark:text-gb-dark-muted ml-auto">0/160</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </form>
+</div>
+
+
+<!--SCRIPTS-->
+<script src="{% static 'js/editor.bundle.js' %}"></script>
+
+<script>
+    // ── State ──────────────────────────────────────────────────────────────────
+    let editor = null;
+    let currentMode = 'html';
+    let autosaveSlug = "{{ post.slug|default:'' }}";
+    let autosaveTimer = null;
+
+    // ── DOM refs ───────────────────────────────────────────────────────────────
+    const bodyInput = () => document.querySelector('#id_body');
+    const contentTypeInput = () => document.querySelector('#id_content_type');
+    const tiptapEl = document.getElementById('tiptap-editor');
+    const mdWrap = document.getElementById('markdown-editor-wrap');
+    const toolbar = document.getElementById('tiptap-toolbar');
+    const btnRich = document.getElementById('btn-rich');
+    const btnMd = document.getElementById('btn-md');
+    const autosaveStatus = document.getElementById('autosave-status');
+    const autosaveDot = document.getElementById('autosave-dot');
+    const autosaveText = document.getElementById('autosave-text');
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        const {Editor, StarterKit, Link, Image, Placeholder} = window.TiptapEditor;
+
+        editor = new Editor({
+            element: tiptapEl,
+            extensions: [
+                StarterKit,
+                Link.configure({openOnClick: false}),
+                Image,
+                Placeholder.configure({placeholder: 'Start writing your post...'}),
+            ],
+            content: (contentTypeInput().value === 'html') ? (bodyInput().value || '') : '',
+            onUpdate() {scheduleAutosave();},
+        });
+
+        // If editing an existing markdown post, boot into markdown mode
+        if (contentTypeInput().value === 'markdown') {
+            switchEditor('markdown');
+        }
+
+        // Meta description char counter
+        const metaInput = document.querySelector('#id_meta_description');
+        const metaCount = document.getElementById('meta-char-count');
+        if (metaInput && metaCount) {
+            const update = () => {
+                const len = metaInput.value.length;
+                metaCount.textContent = `${len}/160`;
+                metaCount.classList.toggle('text-gb-red', len > 140);
+            };
+            metaInput.addEventListener('input', update);
+            update();
+        }
+
+        // Style taggit input (rendered after DOM ready)
+        const tagsInput = document.querySelector('#tags-wrapper input');
+        if (tagsInput) {
+            tagsInput.className = 'w-full px-3 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border bg-gb-bg dark:bg-gb-dark-bg text-gb-text dark:text-gb-dark-text focus:outline-none focus:border-gb-accent transition-colors';
+        }
+
+        // Sync hidden textarea before submit
+        document.getElementById('post-form').addEventListener('submit', () => {
+            if (currentMode === 'html' && editor) {
+                bodyInput().value = editor.getHTML();
+            }
+            contentTypeInput().value = currentMode;
+        });
+
+        // Autosave on title change
+        document.querySelector('#id_title')?.addEventListener('input', scheduleAutosave);
+    });
+
+    // ── Mode switch ────────────────────────────────────────────────────────────
+    function switchEditor(mode) {
+        currentMode = mode;
+        contentTypeInput().value = mode;
+
+        if (mode === 'html') {
+            tiptapEl.classList.remove('hidden');
+            mdWrap.classList.add('hidden');
+            toolbar.classList.remove('hidden');
+            btnRich.classList.add('bg-gb-accent', 'text-white');
+            btnRich.classList.remove('bg-transparent', 'text-gb-muted', 'dark:text-gb-dark-muted');
+            btnMd.classList.remove('bg-gb-accent', 'text-white');
+            btnMd.classList.add('bg-transparent', 'text-gb-muted', 'dark:text-gb-dark-muted');
+        } else {
+            // Move the actual #id_body textarea into the visible markdown wrapper
+            const textarea = bodyInput();
+            if (textarea) {
+                textarea.classList.remove('hidden');
+                Object.assign(textarea.style, {
+                    width: '100%', minHeight: '480px',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontSize: '0.875rem', padding: '1rem',
+                    background: 'transparent', color: 'inherit',
+                    border: 'none', outline: 'none', resize: 'vertical',
+                });
+                mdWrap.appendChild(textarea);
+            }
+            tiptapEl.classList.add('hidden');
+            mdWrap.classList.remove('hidden');
+            toolbar.classList.add('hidden');
+            btnMd.classList.add('bg-gb-accent', 'text-white');
+            btnMd.classList.remove('bg-transparent', 'text-gb-muted', 'dark:text-gb-dark-muted');
+            btnRich.classList.remove('bg-gb-accent', 'text-white');
+            btnRich.classList.add('bg-transparent', 'text-gb-muted', 'dark:text-gb-dark-muted');
+        }
+    }
+
+    // ── Toolbar commands ───────────────────────────────────────────────────────
+    function execCmd(cmd) {
+        if (!editor) return;
+        const c = editor.chain().focus();
+        switch (cmd) {
+            case 'bold': c.toggleBold().run(); break;
+            case 'italic': c.toggleItalic().run(); break;
+            case 'strike': c.toggleStrike().run(); break;
+            case 'code': c.toggleCode().run(); break;
+            case 'h1': c.toggleHeading({level: 1}).run(); break;
+            case 'h2': c.toggleHeading({level: 2}).run(); break;
+            case 'h3': c.toggleHeading({level: 3}).run(); break;
+            case 'bulletList': c.toggleBulletList().run(); break;
+            case 'orderedList': c.toggleOrderedList().run(); break;
+            case 'blockquote': c.toggleBlockquote().run(); break;
+            case 'codeBlock': c.toggleCodeBlock().run(); break;
+            case 'hr': c.setHorizontalRule().run(); break;
+            case 'link': {
+                const url = prompt('Enter URL:');
+                if (url) c.setLink({href: url}).run();
+                break;
+            }
+        }
+    }
+
+    // ── Inline image upload ────────────────────────────────────────────────────
+    function triggerImageUpload() {
+        document.getElementById('tiptap-image-input').click();
+    }
+
+    async function uploadInlineImage(input) {
+        if (!input.files.length) return;
+        const fd = new FormData();
+        fd.append('image', input.files[0]);
+        fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        try {
+            const res = await fetch("{% url 'image_upload' %}", {method: 'POST', body: fd});
+            const data = await res.json();
+            if (data.url && editor) {
+                editor.chain().focus().setImage({src: data.url}).run();
+            }
+        } catch (e) {
+            console.error('Image upload failed', e);
+        }
+        input.value = '';
+    }
+
+    // ── Autosave ───────────────────────────────────────────────────────────────
+    function scheduleAutosave() {
+        clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(doAutosave, 2000);
+    }
+
+    async function doAutosave() {
+        const title = document.querySelector('#id_title')?.value?.trim();
+        if (!title) return;
+
+        const body = (currentMode === 'html' && editor)
+            ? editor.getHTML()
+            : (bodyInput()?.value || '');
+
+        showAutosaveStatus('saving');
+        try {
+            const res = await fetch("{% url 'draft_autosave' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({slug: autosaveSlug, title, body, content_type: currentMode}),
+            });
+            const data = await res.json();
+            if (data.slug) autosaveSlug = data.slug;
+            showAutosaveStatus('saved');
+        } catch (e) {
+            showAutosaveStatus('error');
+        }
+    }
+
+    function showAutosaveStatus(state) {
+        autosaveStatus.classList.remove('opacity-0');
+        autosaveDot.classList.remove('saving-dot');
+        if (state === 'saving') {
+            autosaveDot.classList.add('saving-dot');
+            autosaveText.textContent = 'Saving…';
+            autosaveDot.className = 'w-1.5 h-1.5 rounded-full bg-gb-yellow inline-block saving-dot';
+        } else if (state === 'saved') {
+            const t = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+            autosaveText.textContent = `Draft saved at ${t}`;
+            autosaveDot.className = 'w-1.5 h-1.5 rounded-full bg-gb-green inline-block';
+            setTimeout(() => autosaveStatus.classList.add('opacity-0'), 4000);
+        } else {
+            autosaveText.textContent = 'Autosave failed';
+            autosaveDot.className = 'w-1.5 h-1.5 rounded-full bg-gb-red inline-block';
+        }
+    }
+
+    // ── Expose functions to window so onclick= attributes can call them ────────
+    window.switchEditor = switchEditor;
+    window.execCmd = execCmd;
+    window.triggerImageUpload = triggerImageUpload;
+    window.uploadInlineImage = uploadInlineImage;
+
+    function showAutosaveStatus(state) {
+        autosaveStatus.classList.remove('opacity-0');
+        autosaveDot.classList.remove('saving-dot');
+        if (state === 'saving') {
+            autosaveDot.classList.add('saving-dot');
+            autosaveText.textContent = 'Saving…';
+            autosaveDot.className = 'w-1.5 h-1.5 rounded-full bg-gb-yellow inline-block saving-dot';
+        } else if (state === 'saved') {
+            const t = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+            autosaveText.textContent = `Draft saved at ${t}`;
+            autosaveDot.className = 'w-1.5 h-1.5 rounded-full bg-gb-green inline-block';
+            setTimeout(() => autosaveStatus.classList.add('opacity-0'), 4000);
+        } else {
+            autosaveText.textContent = 'Autosave failed';
+            autosaveDot.className = 'w-1.5 h-1.5 rounded-full bg-gb-red inline-block';
+        }
+    }
+
+    // ── Expose to window for onclick= attributes ─────────────────────────────
+    window.switchEditor = switchEditor;
+    window.execCmd = execCmd;
+    window.triggerImageUpload = triggerImageUpload;
+    window.uploadInlineImage = uploadInlineImage;
+</script>
+</script>
+{% endblock %}
