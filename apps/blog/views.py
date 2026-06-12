@@ -140,7 +140,7 @@ def post_edit(request, slug):
             post.save()
             form.save_m2m()
             messages.success(request, "Post updated successfully!")
-            return redirect("post_detail", slug=post.slug)
+            return redirect("post_details", slug=post.slug)
         else:
             messages.error(request, "Please fix the errors below.")
     else:
