@@ -5,7 +5,6 @@ from django.core.paginator import Paginator
 from django.db import models
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, request
 from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile

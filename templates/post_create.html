@@ -3,10 +3,12 @@
 
 {% block title %}{% if post %}Edit — {{ post.title }}{% else %}Write — Logbook{% endif %}{% endblock %}
 
+{% block main_class %}max-w-7xl{% endblock %}
+
 {% block content %}
 <style>
   .ProseMirror {
-    min-height: 480px;
+    min-height: 620px;
     outline: none;
     padding: 0;
   }
@@ -117,7 +119,7 @@
        (or shown immediately when editing)
   ══════════════════════════════════════════ -->
   <form method="post" enctype="multipart/form-data" id="post-form"
-    class="flex flex-col xl:flex-row gap-6 items-start">
+    class="flex flex-col xl:flex-row gap-8 items-start">
     {% csrf_token %}
     <input type="hidden" id="id_content_type" name="content_type"
            value="{{ form.content_type.value|default:'html' }}">
@@ -176,7 +178,7 @@
         </div>
 
         <!-- Editor area -->
-        <div class="p-4 sm:p-6">
+        <div class="p-6 sm:p-8">
 
           <!-- Tiptap -->
           <div id="tiptap-editor" class="text-gb-text dark:text-gb-dark-text"></div>
@@ -239,7 +241,7 @@
     </div><!-- end left column -->
 
     <!-- RIGHT: Sidebar -->
-    <aside class="w-full xl:w-72 shrink-0 flex flex-col gap-4">
+    <aside class="w-full xl:w-80 shrink-0 flex flex-col gap-4 xl:sticky xl:top-6 xl:self-start xl:max-h-screen xl:overflow-y-auto xl:border-l xl:border-gb-border dark:xl:border-gb-dark-border xl:pl-8">
 
       <!-- Publish -->
       <div class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-4 flex flex-col gap-3">
