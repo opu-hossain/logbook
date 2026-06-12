@@ -29,10 +29,33 @@
 
             <div class="flex flex-col gap-1.5">
                 <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Avatar</label>
-                {% if request.user.avatar %}
-                <img src="{{ request.user.avatar.url }}" class="w-12 h-12 rounded-full object-cover mb-2" />
-                {% endif %}
-                {{ form.avatar }}
+                <div class="flex items-center gap-4">
+                    {% if request.user.avatar %}
+                        <img id="avatar-preview" src="{{ request.user.avatar.url }}"
+                            class="w-14 h-14 min-w-14 rounded-full object-cover border-2 border-gb-border dark:border-gb-dark-border flex-shrink-0" />
+                    {% else %}
+                    <div id="avatar-preview-placeholder"
+                        class="w-14 h-14 rounded-full bg-gb-accent flex items-center justify-center text-white text-xl font-bold border-2 border-gb-border dark:border-gb-dark-border">
+                        {{ request.user.username|first|upper }}
+                    </div>
+                    {% endif %}
+                    <div class="flex flex-col gap-1.5">
+                        <label for="{{ form.avatar.id_for_label }}"
+                            class="cursor-pointer px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:border-gb-accent hover:text-gb-accent transition-colors">
+                            Choose image
+                        </label>
+                        <div class="hidden">{{ form.avatar }}</div>
+                        <p id="avatar-filename" class="text-xs text-gb-muted dark:text-gb-dark-muted">
+                            {% if request.user.avatar %}Current: {{ request.user.avatar.name|slice:"8:" }}{% else %}No file chosen{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Default Editor</label>
+                {{ form.editor_preference }}
+                <p class="text-xs text-gb-muted dark:text-gb-dark-muted">Used when creating new posts.</p>
             </div>
 
             <div class="flex gap-3 mt-2">
@@ -47,4 +70,24 @@
 
     </div>
 </div>
+
+<script>
+document.getElementById('{{ form.avatar.id_for_label }}')?.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    document.getElementById('avatar-filename').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+        const preview = document.getElementById('avatar-preview') || document.getElementById('avatar-preview-placeholder');
+        if (preview) {
+            const img = document.createElement('img');
+            img.id = 'avatar-preview';
+            img.src = e.target.result;
+            img.className = 'w-14 h-14 rounded-full object-cover border-2 border-gb-border dark:border-gb-dark-border';
+            preview.replaceWith(img);
+        }
+    };
+    reader.readAsDataURL(file);
+});
+</script>
 {% endblock %}
