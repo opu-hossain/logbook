@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from markdownx.utils import markdownify
+from django.http import HttpResponse
 import json
 
 from .forms import CommentForm, PostForm
@@ -157,6 +159,13 @@ def image_upload(request):
     path = default_storage.save(f"post_images/{image.name}", ContentFile(image.read()))
     url = request.build_absolute_uri(f"/media/{path}")
     return JsonResponse({"url": url})
+
+
+@login_required
+@require_POST
+def markdown_preview(request):
+    raw = request.POST.get("body", "")
+    return HttpResponse(markdownify(raw))
 
 
 @login_required

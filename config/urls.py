@@ -25,6 +25,7 @@ from django.contrib.auth import views as auth_views
 from apps.blog.feeds import LatestPostsFeed
 from apps.blog.views import (
     home,
+    markdown_preview,
     post_detail,
     blog,
     search,
@@ -87,5 +88,6 @@ urlpatterns = [
     path("write/", post_create, name="post_create"),
     path("post/<slug:slug>/edit/", post_edit, name="post_edit"),
     path("api/upload-image/", image_upload, name="image_upload"),
-    path("apit/draft/autosave/", draft_autosave, name="draft_autosave"),
+    path("api/draft/autosave/", draft_autosave, name="draft_autosave"),
+    path("api/preview-markdown/", markdown_preview, name="markdown_preview"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

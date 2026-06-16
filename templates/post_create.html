@@ -506,7 +506,7 @@ function switchTab(tab) {
 }
 
 // ── Preview renderer ───────────────────────────────────────────────────────
-function renderPreview() {
+async function renderPreview() {
   const title   = document.getElementById('id_title')?.value?.trim() || '';
   const tagsRaw = document.querySelector('#tags-wrapper input')?.value?.trim() || '';
   const catSel  = document.getElementById('id_category');
@@ -517,11 +517,17 @@ function renderPreview() {
   if (currentMode === 'html' && editor) {
     bodyHtml = editor.getHTML();
   } else {
-    const raw = bodyInput()?.value || '';
-    bodyHtml = raw
-      ? `<pre style="white-space:pre-wrap;font-family:inherit;">${escapeHtml(raw)}</pre>
-         <p class="text-xs text-gb-muted dark:text-gb-dark-muted mt-2 italic">↳ Markdown renders fully when published.</p>`
-      : '';
+      const raw = bodyInput()?.value || '';
+      if (!raw) {
+        bodyHtml = '';
+      } else {
+        // Fetch rendered HTML from backend (markdownx)
+        const fd = new FormData();
+        fd.append('body', raw);
+        fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        const res = await fetch("{% url 'markdown_preview' %}", { method: 'POST', body: fd });
+        bodyHtml = await res.text();
+      }
   }
 
   const isEmpty = !title && !bodyHtml;
