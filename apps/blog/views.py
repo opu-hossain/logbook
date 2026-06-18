@@ -111,8 +111,15 @@ def search(request):
 
 @login_required
 def post_create(request):
+    draft = None
+    draft_slug = request.GET.get("draft")
+    if draft_slug:
+        draft = Post.objects.filter(
+            slug=draft_slug, author=request.user, status=Post.Status.DRAFT
+        ).first()
+
     if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
+        form = PostForm(request.POST, request.FILES, instance=draft)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -123,11 +130,11 @@ def post_create(request):
         else:
             messages.error(request, "Please fix the errors!")
     else:
-        form = PostForm()
+        form = PostForm(instance=draft)
     return render(
         request,
         "post_create.html",
-        {"form": form, "editor_mode": request.user.editor_preference},
+        {"form": form, "post": draft, "editor_mode": request.user.editor_preference},
     )
 
 

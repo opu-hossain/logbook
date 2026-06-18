@@ -1,4 +1,4 @@
-from asyncio import sleep
+from enum import unique
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
@@ -61,7 +61,13 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title) or "untitled"
+            unique_slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
+                counter += 1
+                unique_slug = f"{base_slug}-{counter}"
+            self.slug = unique_slug
         super().save(*args, **kwargs)
 
     def __str__(self):

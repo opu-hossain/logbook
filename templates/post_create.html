@@ -640,7 +640,13 @@ async function doAutosave() {
       body: JSON.stringify({ slug: autosaveSlug, title, body, content_type: currentMode }),
     });
     const data = await res.json();
-    if (data.slug) autosaveSlug = data.slug;
+      if (data.slug && data.slug !== autosaveSlug) {
+          autosaveSlug = data.slug;
+
+          const url = new URL(window.location);
+          url.searchParams.set('draft', data.slug);
+          window.history.replaceState({}, '', url);
+      }
     showAutosaveStatus('saved');
   } catch (e) { showAutosaveStatus('error'); }
 }
