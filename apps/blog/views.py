@@ -126,7 +126,7 @@ def post_create(request):
             post.save()
             form.save_m2m()
             messages.success(request, "Post published successfully!")
-            return redirect("post_details", slug=post.slug)
+            return redirect("post_detail", slug=post.slug)
         else:
             messages.error(request, "Please fix the errors!")
     else:
@@ -148,12 +148,22 @@ def post_edit(request, slug):
             post.save()
             form.save_m2m()
             messages.success(request, "Post updated successfully!")
-            return redirect("post_details", slug=post.slug)
+            return redirect("post_detail", slug=post.slug)
         else:
             messages.error(request, "Please fix the errors below.")
     else:
         form = PostForm(instance=post)
     return render(request, "post_create.html", {"form": form, "post": post})
+
+
+@login_required
+def post_delete(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+    if request.method == "POST":
+        post.delete()
+        messages.success(request, "Post deleted.")
+        return redirect("profile")
+    return render(request, "post_delete_confirm.html", {"post": post})
 
 
 @login_required

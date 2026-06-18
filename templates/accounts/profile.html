@@ -40,8 +40,8 @@
 
     </div>
 
-    <!-- Comments -->
-    <div>
+<!-- Comments -->
+    <div class="mb-10">
         <h2 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-4">My Comments ({{ comments.count }})</h2>
         {% if comments %}
         <div class="flex flex-col gap-4">
@@ -63,6 +63,38 @@
         {% else %}
         <p class="text-gb-muted dark:text-gb-dark-muted text-sm">No comments yet.</p>
         {% endif %}
+    </div>
+
+    <!-- My Posts -->
+    <div>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-gb-text dark:text-gb-dark-text">My Posts</h2>
+            <a href="{% url 'post_create' %}"
+                class="px-4 py-1.5 text-xs font-medium rounded bg-gb-accent text-white hover:opacity-90 transition-colors">
+                + New post</a>
+        </div>
+
+        <!-- Status tabs -->
+        <div id="post-status-tabs" class="flex items-center gap-1 mb-4 border-b border-gb-border dark:border-gb-dark-border">
+            <button type="button"
+                hx-get="{% url 'profile' %}?status=all"
+                hx-target="#my-posts-list" hx-swap="innerHTML" hx-push-url="true"
+                class="status-tab px-3 py-2 text-sm font-medium transition-colors {% if status_filter == 'all' %}text-gb-accent border-b-2 border-gb-accent{% else %}text-gb-muted dark:text-gb-dark-muted{% endif %}">
+                All
+            </button>
+            {% for value, label in status_choices %}
+            <button type="button"
+                hx-get="{% url 'profile' %}?status={{ value }}"
+                hx-target="#my-posts-list" hx-swap="innerHTML" hx-push-url="true"
+                class="status-tab px-3 py-2 text-sm font-medium transition-colors {% if status_filter == value %}text-gb-accent border-b-2 border-gb-accent{% else %}text-gb-muted dark:text-gb-dark-muted{% endif %}">
+                {{ label }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <div id="my-posts-list">
+            {% include "partials/user_posts_list.html" %}
+        </div>
     </div>
 
 </div>

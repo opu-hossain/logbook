@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Delete — {{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto py-16">
+    <div
+        class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-6">
+        <h1 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-2">Delete this post?</h1>
+        <p class="text-sm text-gb-muted dark:text-gb-dark-muted mb-1">
+            You're about to permanently delete:
+        </p>
+        <p class="text-sm font-medium text-gb-text dark:text-gb-dark-text mb-6">
+            "{{ post.title }}"
+        </p>
+        <p class="text-xs text-gb-red mb-6">
+            This action cannot be undone.
+        </p>
+
+        <form method="post" class="flex items-center gap-3">
+            {% csrf_token %}
+            <button type="submit"
+                class="px-4 py-2 text-sm font-semibold rounded bg-gb-red text-white hover:opacity-90 active:scale-95 transition-all">
+                Yes, delete it
+            </button>
+            <a href="{% url 'profile' %}"
+                class="px-4 py-2 text-sm font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:text-gb-text dark:hover:text-gb-dark-text transition-colors">
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

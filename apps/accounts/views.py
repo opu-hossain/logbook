@@ -13,7 +13,22 @@ from apps.blog.models import Post
 @login_required
 def profile_view(request):
     comments = request.user.comments.filter(approved=True).order_by("created_at")
-    return render(request, "accounts/profile.html", {"comments": comments})
+
+    status_filter = request.GET.get("status", "all")
+    posts = Post.objects.filter(author=request.user).order_by("-created_at")
+    if status_filter != "all":
+        posts = posts.filter(status=status_filter.upper())
+
+    context = {
+        "comments": comments,
+        "posts": posts,
+        "status_filter": status_filter,
+        "status_choices": Post.Status.choices,
+    }
+    if request.headers.get("HX-Request"):
+        return render(request, "partials/user_posts_list.html", context)
+
+    return render(request, "accounts/profile.html", context)
 
 
 @login_required

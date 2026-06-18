@@ -31,6 +31,7 @@ from apps.blog.views import (
     search,
     post_create,
     post_edit,
+    post_delete,
     image_upload,
     draft_autosave,
 )
@@ -87,6 +88,7 @@ urlpatterns = [
     # post for users
     path("write/", post_create, name="post_create"),
     path("post/<slug:slug>/edit/", post_edit, name="post_edit"),
+    path("post/<slug:slug>/delete/", post_delete, name="post_delete"),
     path("api/upload-image/", image_upload, name="image_upload"),
     path("api/draft/autosave/", draft_autosave, name="draft_autosave"),
     path("api/preview-markdown/", markdown_preview, name="markdown_preview"),
