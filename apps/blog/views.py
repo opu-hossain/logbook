@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from markdownx.utils import markdownify
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
 
 from .forms import CommentForm, PostForm
@@ -185,7 +185,7 @@ def draft_autosave(request):
         post.body = body
         post.content_type = content_type
         post.status = Post.Status.DRAFT
-        post.save(update_fields=["body", "content_type", "status", "updated_at"])
+        post.save(update_fields=["body", "content_type", "status"])
         return JsonResponse({"status": "saved", "slug": post.slug})
     else:
         title = data.get("title", "").strip()
