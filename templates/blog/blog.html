@@ -30,7 +30,7 @@
 <!-- Post grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for post in page_obj %}
-    {% include "partials/post_card.html" %}
+    {% include "blog/post_card.html" %}
     {% empty %}
     <div class="col-span-full text-center py-20">
       <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm">

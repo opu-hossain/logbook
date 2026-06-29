@@ -9,7 +9,7 @@ from django.db import models
 
 def home(request):
     posts = Post.objects.filter(status=Post.Status.PUBLISHED).order_by("-created_at")
-    return render(request, "home.html", {"posts": posts})
+    return render(request, "pages/home.html", {"posts": posts})
 
 
 def post_detail(request, slug):
@@ -31,7 +31,7 @@ def post_detail(request, slug):
             if request.headers.get("HX-Request"):
                 return render(
                     request,
-                    "partials/comment_success.html",
+                    "comments/comment_success.html",
                     {
                         "post": post,
                         "toast_message": "Comment submitted! Awaiting approval.",
@@ -41,11 +41,11 @@ def post_detail(request, slug):
         else:
             if request.headers.get("HX-Request"):
                 return render(
-                    request, "partials/comment_form.html", {"form": form, "post": post}
+                    request, "comments/comment_form.html", {"form": form, "post": post}
                 )
 
     return render(
-        request, "detail.html", {"post": post, "comments": comments, "form": form}
+        request, "blog/detail.html", {"post": post, "comments": comments, "form": form}
     )
 
 
@@ -64,7 +64,7 @@ def blog(request):
     page_obj = paginator.get_page(page_number)
     return render(
         request,
-        "blog.html",
+        "blog/blog.html",
         {
             "page_obj": page_obj,
             "categories": categories,
@@ -89,11 +89,11 @@ def search(request):
     if request.headers.get("HX-Request"):
         return render(
             request,
-            "partials/search_results.html",
+            "blog/search_results.html",
             {
                 "results": results,
                 "query": query,
             },
         )
 
-    return render(request, "search.html", {"results": results, "query": query})
+    return render(request, "pages/search.html", {"results": results, "query": query})
