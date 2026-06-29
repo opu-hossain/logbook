@@ -28,7 +28,7 @@ def profile_view(request):
     if request.headers.get("HX-Request"):
         return render(request, "partials/user_posts_list.html", context)
 
-    return render(request, "accounts/profile.html", context)
+    return render(request, "users/profile.html", context)
 
 
 @login_required
@@ -41,7 +41,7 @@ def profile_edit_view(request):
             return redirect("profile")
     else:
         form = ProfileEditForm(instance=request.user)
-    return render(request, "accounts/profile_edit.html", {"form": form})
+    return render(request, "users/profile_edit.html", {"form": form})
 
 
 def author_profile_view(request, username):
@@ -50,7 +50,7 @@ def author_profile_view(request, username):
         "-created_at"
     )
     return render(
-        request, "accounts/author_profile.html", {"author": author, "posts": posts}
+        request, "users/author_profile.html", {"author": author, "posts": posts}
     )
 
 
@@ -68,7 +68,7 @@ def register_view(request):
 
     else:
         form = RegisterForm()
-    return render(request, "accounts/register.html", {"form": form})
+    return render(request, "users/register.html", {"form": form})
 
 
 def login_view(request):
@@ -90,7 +90,7 @@ def login_view(request):
                     "class": "w-full px-3 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface text-gb-text dark:text-gb-dark-text focus:outline-none focus:border-gb-accent transition-colors"
                 }
             )
-    return render(request, "accounts/login.html", {"form": form})
+    return render(request, "users/login.html", {"form": form})
 
 
 def logout_view(request):
