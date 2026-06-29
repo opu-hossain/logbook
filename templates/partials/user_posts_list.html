@@ -1,28 +1,27 @@
 {% if posts %}
 <div class="flex flex-col gap-3">
     {% for post in posts %}
-    <div
-        class="flex items-center justify-between gap-4 p-4 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface">
+    <div class="flex items-center justify-between gap-4 p-4 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface hover:border-gb-accent dark:hover:border-gb-accent transition-colors">
         <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-                <span class="text-xs font-medium px-2 py-0.5 rounded-full
-                    {% if post.status == 'PB' %}bg-gb-green/20 text-gb-green
-                    {% elif post.status == 'DF' %}bg-gb-yellow/20 text-gb-yellow
+            <div class="flex items-center gap-2 mb-1.5 font-log text-xs">
+                <span class="lowercase px-2 py-0.5 rounded-full font-medium
+                    {% if post.status == 'PB' %}bg-gb-green/15 text-gb-green
+                    {% elif post.status == 'DF' %}bg-gb-yellow/15 text-gb-yellow
                     {% else %}bg-gb-border dark:bg-gb-dark-border text-gb-muted dark:text-gb-dark-muted{% endif %}">
                     {{ post.get_status_display }}
                 </span>
-                <span class="text-xs text-gb-muted dark:text-gb-dark-muted">{{ post.updated_at|date:"M j, Y" }}</span>
+                <span class="text-gb-muted dark:text-gb-dark-muted">{{ post.updated_at|date:"Y-m-d" }}</span>
             </div>
             <p class="text-sm font-medium text-gb-text dark:text-gb-dark-text truncate">{{ post.title }}</p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
             {% if post.status == 'PB' %}
             <a href="{% url 'post_detail' post.slug %}"
-                class="px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:text-gb-text dark:hover:text-gb-dark-text transition-colors">
+                class="px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:text-gb-text dark:hover:text-gb-dark-text hover:border-gb-accent transition-colors">
                 View</a>
             {% endif %}
             <a href="{% url 'post_edit' post.slug %}"
-                class="px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:text-gb-text dark:hover:text-gb-dark-text transition-colors">
+                class="px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:text-gb-text dark:hover:text-gb-dark-text hover:border-gb-accent transition-colors">
                 Edit</a>
             <a href="{% url 'post_delete' post.slug %}"
                 class="px-3 py-1.5 text-xs font-medium rounded border border-gb-red/40 text-gb-red hover:bg-gb-red hover:text-white transition-colors">
@@ -32,5 +31,7 @@
     {% endfor %}
 </div>
 {% else %}
-<p class="text-gb-muted dark:text-gb-dark-muted text-sm py-6">No posts in this category yet.</p>
+<div class="text-center py-12">
+  <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm">no entries in this category yet.</p>
+</div>
 {% endif %}

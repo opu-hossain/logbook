@@ -1,16 +1,21 @@
 <div>
-    <!-- Debug: Show query and count -->
-    <p class="text-sm text-gray-500 mb-4">Found {{ results|length }} results for "{{ query }}"</p>
+    {% if query %}
+    <p class="font-log text-xs text-gb-muted dark:text-gb-dark-muted uppercase tracking-widest mb-6">
+      {{ results|length }} result{{ results|length|pluralize }} for "{{ query }}"
+    </p>
+    {% endif %}
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for post in results %}
         {% include "partials/post_card.html" %}
         {% empty %}
-        {% if query %}
-        <p class="text-gb-muted dark:text-gb-dark-muted col-span-3">No posts found for "{{ query }}".</p>
-        {% else %}
-        <p class="text-gb-muted dark:text-gb-dark-muted col-span-3">Start typing to search posts.</p>
-        {% endif %}
+        <div class="col-span-full text-center py-20">
+          {% if query %}
+          <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm">no entries found for "{{ query }}".</p>
+          {% else %}
+          <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm">start typing to search entries.</p>
+          {% endif %}
+        </div>
         {% endfor %}
     </div>
 </div>

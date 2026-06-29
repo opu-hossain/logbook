@@ -25,15 +25,9 @@ from django.contrib.auth import views as auth_views
 from apps.blog.feeds import LatestPostsFeed
 from apps.blog.views import (
     home,
-    markdown_preview,
     post_detail,
     blog,
     search,
-    post_create,
-    post_edit,
-    post_delete,
-    image_upload,
-    draft_autosave,
 )
 from apps.blog.sitemaps import PostSitemap
 
@@ -47,7 +41,7 @@ urlpatterns = [
     path("post/<slug:slug>/", post_detail, name="post_detail"),
     path("search/", search, name="search"),
     path("feed/", LatestPostsFeed(), name="feed"),
-    path("auth/", include("apps.accounts.urls")),
+    path("auth/", include("apps.users.urls")),
     # [sitemap-path]
     path(
         "sitemap.xml",
@@ -85,11 +79,4 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
-    # post for users
-    path("write/", post_create, name="post_create"),
-    path("post/<slug:slug>/edit/", post_edit, name="post_edit"),
-    path("post/<slug:slug>/delete/", post_delete, name="post_delete"),
-    path("api/upload-image/", image_upload, name="image_upload"),
-    path("api/draft/autosave/", draft_autosave, name="draft_autosave"),
-    path("api/preview-markdown/", markdown_preview, name="markdown_preview"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

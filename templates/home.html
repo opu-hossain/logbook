@@ -4,12 +4,75 @@
 
 {% block content %}
 
+<!-- Masthead — swap this copy for your own intro whenever you like -->
+<div class="mb-12 pb-8 border-b border-gb-border dark:border-gb-dark-border">
+  <p class="font-log text-xs text-gb-muted dark:text-gb-dark-muted uppercase tracking-widest mb-3">~/logbook · entry log</p>
+  <h1 class="text-3xl sm:text-4xl font-bold text-gb-text dark:text-gb-dark-text leading-tight mb-3">
+    Notes from the terminal.
+  </h1>
+  <p class="text-gb-muted dark:text-gb-dark-muted max-w-xl leading-relaxed">
+    Writing, shipping, and documenting what I learn along the way.
+  </p>
+</div>
+
+{% with featured=posts|first remaining=posts|slice:"1:" %}
+
+{% if featured %}
+<!-- Featured / latest entry -->
+<a href="{% url 'post_detail' featured.slug %}" class="group block mb-12">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-0 items-stretch rounded-lg border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface overflow-hidden hover:border-gb-accent dark:hover:border-gb-accent transition-colors">
+
+    <div class="order-2 md:order-1 p-6 sm:p-8 flex flex-col justify-center gap-4">
+      <div class="flex items-center gap-2 font-log text-xs text-gb-muted dark:text-gb-dark-muted uppercase tracking-widest">
+        <span class="text-gb-accent">●</span> latest entry
+        {% if featured.category %}<span>·</span><span>{{ featured.category.name }}</span>{% endif %}
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-bold text-gb-text dark:text-gb-dark-text leading-snug group-hover:text-gb-accent transition-colors">
+        {{ featured.title }}
+      </h2>
+      <p class="text-sm text-gb-muted dark:text-gb-dark-muted leading-relaxed">
+        {{ featured.body|truncatewords:28 }}
+      </p>
+      <div class="flex items-center gap-2 mt-2">
+        <span class="w-6 h-6 rounded-full bg-gb-accent flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+          {{ featured.author.get_full_name|first|upper|default:featured.author.username|first|upper }}
+        </span>
+        <span class="text-xs font-medium text-gb-text dark:text-gb-dark-text">{{ featured.author.get_full_name|default:featured.author.username }}</span>
+        <span class="font-log text-xs text-gb-muted dark:text-gb-dark-muted">· {{ featured.created_at|date:"Y-m-d" }}</span>
+      </div>
+    </div>
+
+    <div class="order-1 md:order-2 h-56 md:h-full">
+      {% if featured.featured_image %}
+      <img src="{{ featured.featured_image.url }}" alt="{{ featured.title }}" class="w-full h-full object-cover" />
+      {% else %}
+      <div class="w-full h-full bg-gb-accent flex items-center justify-center">
+        <span class="text-6xl font-bold text-white opacity-40">{{ featured.title|first|upper }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</a>
+{% endif %}
+
+<!-- Recent entries -->
+{% if remaining %}
+<div class="flex items-center justify-between mb-6">
+  <h3 class="font-log text-xs font-semibold text-gb-muted dark:text-gb-dark-muted uppercase tracking-widest">recent entries</h3>
+  <a href="/blog/" class="text-sm text-gb-accent hover:text-gb-accent-hover transition-colors">View all →</a>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {% for post in posts %}
+  {% for post in remaining %}
     {% include "partials/post_card.html" %}
-  {% empty %}
-    <p class="text-gb-muted dark:text-gb-dark-muted col-span-3">No posts yet.</p>
   {% endfor %}
 </div>
+{% elif not featured %}
+<div class="text-center py-20">
+  <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm">no entries logged yet.</p>
+</div>
+{% endif %}
+
+{% endwith %}
 
 {% endblock %}

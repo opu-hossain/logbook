@@ -3,25 +3,28 @@
 
 {% block title %}{{ post.title }} — Logbook{% endblock %}
 
+{% block main_class %}max-w-5xl{% endblock %}
+
 {% block content %}
 
-<article class="max-w-2xl mx-auto">
+<!-- Breadcrumb -->
+<div class="font-log text-xs text-gb-muted dark:text-gb-dark-muted mb-6 max-w-3xl mx-auto">
+  <a href="/blog/" class="hover:text-gb-accent transition-colors">~/logbook/blog</a><span>/{{ post.slug }}</span>
+</div>
+
+<article class="max-w-3xl mx-auto">
 
     <!-- Category + Date -->
-    <div class="flex items-center gap-2 mb-4">
+    <div class="flex items-center gap-2 mb-4 font-log text-xs">
         {% if post.category %}
-        <span class="text-xs font-medium text-gb-accent uppercase tracking-wide">
-            {{ post.category.name }}
-        </span>
-        <span class="text-gb-muted dark:text-gb-dark-muted text-sm">·</span>
+        <span class="font-medium text-gb-accent uppercase tracking-wide">{{ post.category.name }}</span>
+        <span class="text-gb-muted dark:text-gb-dark-muted">·</span>
         {% endif %}
-        <span class="text-sm text-gb-muted dark:text-gb-dark-muted">
-            {{ post.created_at|date:"M j, Y" }}
-        </span>
+        <span class="text-gb-muted dark:text-gb-dark-muted">{{ post.created_at|date:"Y-m-d" }}</span>
     </div>
 
     <!-- Title -->
-    <h1 class="text-3xl font-bold text-gb-text dark:text-gb-dark-text leading-tight mb-4">
+    <h1 class="text-3xl sm:text-4xl font-bold text-gb-text dark:text-gb-dark-text leading-tight mb-4">
         {{ post.title }}
     </h1>
 
@@ -30,11 +33,9 @@
         <div class="w-8 h-8 rounded-full bg-gb-accent flex items-center justify-center text-sm font-bold text-white">
             {{ post.author.get_full_name|first|upper|default:post.author.username|first|upper }}
         </div>
-        <span class="text-sm font-medium text-gb-text dark:text-gb-dark-text">
-          <a href="{% url 'author_profile' post.author.username %}" class="text-sm font-medium text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors">
-               {{ post.author.get_full_name|default:post.author.username }}
-          </a>
-        </span>
+        <a href="{% url 'author_profile' post.author.username %}" class="text-sm font-medium text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors">
+            {{ post.author.get_full_name|default:post.author.username }}
+        </a>
     </div>
 
     <!-- Featured image -->
@@ -70,8 +71,7 @@
     {% if post.tags.all %}
     <div class="flex flex-wrap gap-2 mt-10 pt-6 border-t border-gb-border dark:border-gb-dark-border">
         {% for tag in post.tags.all %}
-        <span
-            class="text-xs px-3 py-1 rounded-full bg-gb-surface dark:bg-gb-dark-surface text-gb-muted dark:text-gb-dark-muted">
+        <span class="font-log text-xs px-3 py-1 rounded-full bg-gb-surface dark:bg-gb-dark-surface text-gb-muted dark:text-gb-dark-muted">
             #{{ tag.name }}
         </span>
         {% endfor %}
@@ -80,17 +80,12 @@
 
 </article>
 
-<!-- Comments section -->
-<section class="mt-12 pt-8 border-t border-gb-border dark:border-gb-dark-border">
+<!-- Comments -->
+<section class="max-w-3xl mx-auto mt-12 pt-8 border-t border-gb-border dark:border-gb-dark-border">
 
   <h2 class="text-xl font-bold text-gb-text dark:text-gb-dark-text mb-6">
-    Comments ({{ comments.count }})
+    Comments <span class="font-log text-gb-muted dark:text-gb-dark-muted">({{ comments.count }})</span>
   </h2>
-
-<!-- Comments section -->
-<section class="mt-12 pt-8 border-t border-gb-border dark:border-gb-dark-border">
-
-  <h2 class="text-xl font-bold text-gb-text dark:text-gb-dark-text mb-6">Comments ({{ comments.count }})</h2>
 
   {% if comments %}
   <div class="flex flex-col gap-6 mb-10">
@@ -106,7 +101,7 @@
       <div class="flex-1">
         <div class="flex items-center gap-2 mb-1">
           <span class="text-sm font-medium text-gb-text dark:text-gb-dark-text">{{ comment.get_author_name }}</span>
-          <span class="text-xs text-gb-muted dark:text-gb-dark-muted">{{ comment.created_at|date:"M j, Y" }}</span>
+          <span class="font-log text-xs text-gb-muted dark:text-gb-dark-muted">{{ comment.created_at|date:"Y-m-d" }}</span>
         </div>
         <p class="text-sm text-gb-text dark:text-gb-dark-text leading-relaxed">{{ comment.body }}</p>
       </div>
@@ -114,7 +109,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <p class="text-gb-muted dark:text-gb-dark-muted text-sm mb-10">No comments yet. Be the first!</p>
+  <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm mb-10">no comments yet. be the first.</p>
   {% endif %}
 
   <h3 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-4">Leave a Comment</h3>
