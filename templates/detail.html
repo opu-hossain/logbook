@@ -3,9 +3,10 @@
 
 {% block title %}{{ post.title }} — Logbook{% endblock %}
 
-{% block main_class %}max-w-5xl{% endblock %}
-
 {% block content %}
+
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-x-12 items-start">
+<div class="min-w-0">
 
 <!-- Breadcrumb -->
 <div class="font-log text-xs text-gb-muted dark:text-gb-dark-muted mb-6 max-w-3xl mx-auto">
@@ -112,11 +113,55 @@
   <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm mb-10">no comments yet. be the first.</p>
   {% endif %}
 
-  <h3 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-4">Leave a Comment</h3>
+<h3 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-4">Leave a Comment</h3>
   <div id="comment-form-wrapper">
     {% include "partials/comment_form.html" %}
   </div>
 
 </section>
+
+</div>
+
+<aside class="hidden lg:block lg:sticky lg:top-24 self-start">
+  <h2 class="font-log text-xs font-semibold uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted mb-3">On this page</h2>
+  <nav id="toc-nav" class="flex flex-col gap-2 text-sm border-l border-gb-border dark:border-gb-dark-border pl-4"></nav>
+</aside>
+
+</div>
+
+<script>
+  (function () {
+    const nav = document.getElementById('toc-nav');
+    const prose = document.querySelector('.prose');
+    if (!nav || !prose) return;
+
+    const headings = prose.querySelectorAll('h2, h3');
+    if (!headings.length) {
+      nav.closest('aside').classList.add('hidden');
+      return;
+    }
+
+    const seen = {};
+    function slugify(text) {
+      let base = text.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+      if (!base) base = 'section';
+      let slug = base, i = 1;
+      while (seen[slug]) { slug = base + '-' + (++i); }
+      seen[slug] = true;
+      return slug;
+    }
+
+    headings.forEach(function (h) {
+      if (!h.id) h.id = slugify(h.textContent);
+      h.style.scrollMarginTop = '6rem'; // clears the sticky navbar on anchor jump
+      const link = document.createElement('a');
+      link.href = '#' + h.id;
+      link.textContent = h.textContent;
+      link.className = (h.tagName === 'H3' ? 'pl-3 ' : '') +
+        'text-gb-muted dark:text-gb-dark-muted hover:text-gb-accent transition-colors';
+      nav.appendChild(link);
+    });
+  })();
+</script>
 
 {% endblock %}

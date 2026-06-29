@@ -118,6 +118,12 @@ MARKDOWNIFY = {
             "th",
             "td",
         ],
+        "WHITELIST_ATTRS": [
+            "href",
+            "title",
+            "src",
+            "alt",
+        ],
     }
 }
 
