@@ -161,12 +161,13 @@ def _replace_pages(project, pages_data):
 
 def _build_nav_tree(pages_data, categories):
     folders = {}
+    root = []
 
     def ensure_folder(path):
         if path in folders:
             return folders[path]
         cat = categories.get(path, {})
-        label = cat.get("label") or _humanize(path.rsplit("/", 1)[-1]) if path else ""
+        label = cat.get("label") or _humanize(path.rsplit("/", 1)[-1])
         node = {
             "type": "folder",
             "path": path,
@@ -175,9 +176,10 @@ def _build_nav_tree(pages_data, categories):
             "children": [],
         }
         folders[path] = node
+        parent = path.rsplit("/", 1)[0] if "/" in path else ""
+        (root if parent == "" else ensure_folder(parent)["children"]).append(node)
         return node
 
-    root = []
     for d in pages_data:
         page_node = {
             "type": "page",
@@ -188,12 +190,6 @@ def _build_nav_tree(pages_data, categories):
         (root if d["folder"] == "" else ensure_folder(d["folder"])["children"]).append(
             page_node
         )
-
-    for path, node in list(folders.items()):
-        parent = path.rsplit("/", 1)[0] if "/" in path else ""
-        target = root if parent == "" else ensure_folder(parent)["children"]
-        if node not in target:
-            target.append(node)
 
     def sort_tree(nodes):
         nodes.sort(key=lambda n: (n["order"], n["label"].lower()))

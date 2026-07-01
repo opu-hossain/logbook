@@ -1,0 +1,30 @@
+{% load docs_extras %}
+<ul
+    class="flex flex-col gap-0.5{% if not top %} pl-3 mt-1 border-l border-gb-border dark:border-gb-dark-border{% endif %}">
+    {% for node in nodes %}
+    <li>
+        {% if node.type == 'page' %}
+        <a href="{% if node.slug %}{% url 'doc_page' project_slug node.slug %}{% else %}{% url 'project_docs_index' project_slug %}{% endif %}"
+            class="block px-2 py-1.5 rounded text-sm transition-colors
+         {% if node.slug == active_slug %}bg-gb-accent/10 text-gb-accent font-medium{% else %}text-gb-muted dark:text-gb-dark-muted hover:text-gb-accent dark:hover:text-gb-accent hover:bg-gb-bg dark:hover:bg-gb-dark-bg{% endif %}">
+            {{ node.label }}
+        </a>
+        {% else %}
+        <div x-data="{ open: {% if active_slug|in_folder:node.path %}true{% else %}false{% endif %} }">
+            <button type="button" @click="open = !open"
+                class="w-full flex items-center justify-between gap-2 px-2 pt-3 pb-1 font-log text-[11px] font-semibold uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted hover:text-gb-accent dark:hover:text-gb-accent transition-colors">
+                <span>{{ node.label }}</span>
+                <svg class="w-3 h-3 flex-shrink-0 transition-transform duration-150" :class="{ '-rotate-90': !open }"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
+                {% include "docs/nav_tree.html" with nodes=node.children top=False %}
+            </div>
+        </div>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
