@@ -42,6 +42,7 @@ urlpatterns = [
     path("search/", search, name="search"),
     path("feed/", LatestPostsFeed(), name="feed"),
     path("user/", include("apps.users.urls")),
+    path("projects/", include("apps.docs.urls")),
     # [sitemap-path]
     path(
         "sitemap.xml",

@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     # apps
     "apps.users",
     "apps.blog",
+    "apps.docs",
     "taggit",
     "markdownx",
     "markdownify.apps.MarkdownifyConfig",

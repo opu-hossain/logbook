@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Projects — Logbook{% endblock %}
+{% block content %}
+<div class="mb-10 pb-6 border-b border-gb-border dark:border-gb-dark-border flex items-center justify-between">
+    <div>
+        <p class="font-log text-xs text-gb-muted dark:text-gb-dark-muted uppercase tracking-widest mb-3">
+            ~/logbook/projects</p>
+        <h1 class="text-3xl font-bold text-gb-text dark:text-gb-dark-text">Projects</h1>
+    </div>
+    <a href="{% url 'project_create' %}"
+        class="px-4 py-2 text-sm font-medium rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors">Connect
+        Repo</a>
+</div>
+
+{% if projects %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for project in projects %}
+    <div
+        class="p-5 rounded-lg border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+            <h2 class="font-bold text-gb-text dark:text-gb-dark-text">{{ project.name }}</h2>
+            <span class="font-log text-xs px-2 py-0.5 rounded-full
+        {% if project.sync_status == 'synced' %}bg-gb-green/15 text-gb-green
+        {% elif project.sync_status == 'failed' %}bg-gb-red/15 text-gb-red
+        {% elif project.sync_status == 'syncing' %}bg-gb-yellow/15 text-gb-yellow
+        {% else %}bg-gb-border dark:bg-gb-dark-border text-gb-muted dark:text-gb-dark-muted{% endif %}">
+                {{ project.get_sync_status_display }}
+            </span>
+        </div>
+        <p class="font-log text-xs text-gb-muted dark:text-gb-dark-muted">{{ project.github_full_name }}</p>
+        {% if project.sync_error %}<p class="text-xs text-gb-red">{{ project.sync_error }}</p>{% endif %}
+        <div class="flex items-center gap-2 mt-auto pt-3 border-t border-gb-border dark:border-gb-dark-border">
+            <a href="{% url 'project_docs_index' project.slug %}"
+                class="flex-1 text-center px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">View
+                Docs</a>
+            <form method="post" action="{% url 'project_sync' project.slug %}">
+                {% csrf_token %}
+                <button type="submit"
+                    class="px-3 py-1.5 text-xs font-medium rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Sync
+                    Now</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-20">
+    <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm mb-4">no projects connected yet.</p>
+    <a href="{% url 'project_create' %}"
+        class="px-4 py-2 text-sm font-medium rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors">Connect
+        your first repo</a>
+</div>
+{% endif %}
+{% endblock %}

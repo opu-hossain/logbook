@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load markdownify %}
+{% block title %}{{ page.title }} — {{ project.name }} — Logbook{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-x-10">
+    <aside class="lg:sticky lg:top-24 self-start mb-8 lg:mb-0">
+        <p class="font-log text-xs text-gb-muted dark:text-gb-dark-muted uppercase tracking-widest mb-3">
+            {{project.name}}</p>
+        <nav class="flex flex-col gap-1.5 text-sm">
+            {% for p in project.pages.all %}
+            <a href="{% if p.slug_path %}{% url 'doc_page' project.slug p.slug_path %}{% else %}{% url 'project_docs_index' project.slug %}{% endif %}"
+                class="{% if p.slug_path == page.slug_path %}text-gb-accent font-medium{% else %}text-gb-muted dark:text-gb-dark-muted hover:text-gb-accent{% endif %} transition-colors">
+                {{ p.nav_label }}
+            </a>
+            {% endfor %}
+        </nav>
+    </aside>
+    <article class="min-w-0 prose max-w-none
+    prose-headings:text-gb-text dark:prose-headings:text-gb-dark-text
+    prose-p:text-gb-text dark:prose-p:text-gb-dark-text
+    prose-strong:text-gb-text dark:prose-strong:text-gb-dark-text
+    prose-a:text-gb-accent
+    prose-code:text-gb-yellow
+    prose-pre:bg-gb-dark-surface dark:prose-pre:bg-gb-dark-surface
+    prose-li:text-gb-text dark:prose-li:text-gb-dark-text">
+        <h1>{{ page.title }}</h1>
+        {{ page.raw_markdown|markdownify }}
+    </article>
+</div>
+{% endblock %}
