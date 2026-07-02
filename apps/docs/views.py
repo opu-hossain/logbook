@@ -40,6 +40,22 @@ def project_create(request):
 
 @login_required
 @require_POST
+def project_delete(request, project_slug):
+    project = get_object_or_404(Project, slug=project_slug, owner=request.user)
+    confirm_name = request.POST.get("confirm_name", "")
+    if confirm_name != project.github_repo:
+        messages.error(
+            request, "Repository name didn't match — project was not deleted."
+        )
+        return redirect("project_list")
+    name = project.name
+    project.delete()
+    messages.success(request, f'"{name}" was permanently deleted.')
+    return redirect("project_list")
+
+
+@login_required
+@require_POST
 def project_sync(request, project_slug):
     project = get_object_or_404(Project, slug=project_slug, owner=request.user)
     try:

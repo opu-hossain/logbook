@@ -15,8 +15,7 @@
 {% if projects %}
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for project in projects %}
-    <div
-        class="p-5 rounded-lg border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface flex flex-col gap-3">
+      <div x-data="{ deleteModalOpen: false, confirmText: '' }" class="relative p-5 rounded-lg border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface flex flex-col gap-3">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-gb-text dark:text-gb-dark-text">{{ project.name }}</h2>
             <span class="font-log text-xs px-2 py-0.5 rounded-full
@@ -33,7 +32,7 @@
           <span class="{% if project.is_public %}text-gb-green{% endif %}">{% if project.is_public %}Public{% else %}Private{% endif %}</span>
         </div>
         {% if project.sync_error %}<p class="text-xs text-gb-red">{{ project.sync_error }}</p>{% endif %}
-        <div class="flex items-center gap-2 mt-auto pt-3 border-t border-gb-border dark:border-gb-dark-border">
+    <div class="flex items-center gap-2 mt-auto pt-3 border-t border-gb-border dark:border-gb-dark-border">
           <a href="{% url 'project_docs_index' project.slug %}" class="flex-1 text-center px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">View Docs</a>
           <form method="post" action="{% url 'project_toggle_visibility' project.slug %}">
             {% csrf_token %}
@@ -41,15 +40,48 @@
               {% if project.is_public %}Make Private{% else %}Make Public{% endif %}
             </button>
           </form>
-            <form method="post" action="{% url 'project_sync' project.slug %}">
-                {% csrf_token %}
-                <button type="submit"
-                    class="px-3 py-1.5 text-xs font-medium rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Sync
-                    Now</button>
-            </form>
+          <form method="post" action="{% url 'project_sync' project.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="px-3 py-1.5 text-xs font-medium rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Sync Now</button>
+          </form>
+          <button @click="deleteModalOpen = true" type="button" title="Delete project"
+            class="p-1.5 rounded border border-gb-red/40 text-gb-red hover:bg-gb-red hover:text-white transition-colors flex-shrink-0">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" />
+            </svg>
+          </button>
         </div>
-    </div>
-    {% endfor %}
+
+        <!-- Delete confirmation modal -->
+        <div x-show="deleteModalOpen" x-cloak
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+          x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+          <div class="absolute inset-0 bg-black/50" @click="deleteModalOpen = false"></div>
+          <div class="relative w-full max-w-md bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-6">
+            <h3 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-3">Delete "{{ project.name }}"?</h3>
+            <p class="text-sm text-gb-red leading-relaxed mb-4">
+              This will permanently delete this project and every synced doc page under it. This cannot be undone.
+            </p>
+            <form method="post" action="{% url 'project_delete' project.slug %}">
+              {% csrf_token %}
+              <label class="text-xs text-gb-muted dark:text-gb-dark-muted mb-1.5 block">
+                Type <span class="font-log font-semibold text-gb-text dark:text-gb-dark-text">{{ project.github_repo }}</span> to confirm.
+              </label>
+              <input type="text" name="confirm_name" x-model="confirmText" autocomplete="off" spellcheck="false"
+                class="w-full px-3 py-2 text-sm rounded border border-gb-border dark:border-gb-dark-border bg-gb-bg dark:bg-gb-dark-bg text-gb-text dark:text-gb-dark-text focus:outline-none focus:border-gb-red transition-colors mb-4" />
+              <div class="flex gap-3">
+                <button type="button" @click="deleteModalOpen = false; confirmText = ''"
+                  class="flex-1 py-2 text-sm font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent transition-colors">Cancel</button>
+                <button type="submit" :disabled="confirmText !== '{{ project.github_repo|escapejs }}'"
+                  :class="confirmText === '{{ project.github_repo|escapejs }}' ? 'bg-gb-red hover:bg-red-700 text-white cursor-pointer' : 'bg-gb-border dark:bg-gb-dark-border text-gb-muted dark:text-gb-dark-muted cursor-not-allowed'"
+                  class="flex-1 py-2 text-sm font-semibold rounded transition-colors">Delete Project</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+  {% endfor %}
 </div>
 {% else %}
 <div class="text-center py-20">
