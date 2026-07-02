@@ -3,8 +3,6 @@ title: Installation Guide
 order: 1
 ---
 
-# Installation Guide
-
 Follow the steps below to set up the Logbook development environment on your local machine.
 
 ## Prerequisites
