@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -51,5 +52,20 @@ def project_sync(request, project_slug):
 
 def doc_page(request, project_slug, page_path=""):
     project = get_object_or_404(Project, slug=project_slug)
+    if not project.is_public and project.owner_id != getattr(request.user, "id", None):
+        raise Http404("No Project matches the given query.")
     page = get_object_or_404(DocPage, project=project, slug_path=page_path.strip("/"))
     return render(request, "docs/doc_page.html", {"project": project, "page": page})
+
+
+@login_required
+@require_POST
+def project_toggle_visibility(request, project_slug):
+    project = get_object_or_404(Project, slug=project_slug, owner=request.user)
+    project.is_public = not project.is_public
+    project.save(update_fields=["is_public"])
+    messages.success(
+        request,
+        f'"{project.name}" is now {"public" if project.is_public else "private"}.',
+    )
+    return redirect("project_list")

@@ -22,6 +22,10 @@ class Project(models.Model):
     github_repo = models.CharField(max_length=200)
     default_branch = models.CharField(max_length=100, default="main", blank=True)
     docs_path = models.CharField(max_length=200, default="docs", blank=True)
+    is_public = models.BooleanField(
+        default=False,
+        help_text="Public docs are viewable by anyone with the link. Private docs are visible only to you.",
+    )
     nav_tree = models.JSONField(default=list, blank=True)
     sync_status = models.CharField(
         max_length=10, choices=SyncStatus.choices, default=SyncStatus.PENDING

@@ -23,7 +23,7 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ["name", "default_branch", "docs_path"]
+        fields = ["name", "default_branch", "docs_path", "is_public"]
         widgets = {
             "name": forms.TextInput(
                 attrs={
@@ -36,6 +36,9 @@ class ProjectForm(forms.ModelForm):
             ),
             "docs_path": forms.TextInput(
                 attrs={"placeholder": "docs", "class": INPUT_CLASS}
+            ),
+            "is_public": forms.CheckboxInput(
+                attrs={"class": "w-4 h-4 rounded accent-gb-accent"}
             ),
         }
 

@@ -29,9 +29,12 @@
                     {{ form.docs_path }}
                 </div>
             </div>
-            <button type="submit"
-                class="w-full py-2.5 text-sm font-semibold rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors mt-2">Connect
-                & Sync</button>
+            <label class="flex items-center gap-2 cursor-pointer">
+                {{ form.is_public }}
+                <span class="text-sm text-gb-text dark:text-gb-dark-text">Make this project public</span>
+            </label>
+            <p class="text-xs text-gb-muted dark:text-gb-dark-muted -mt-2">Private projects are visible only to you while signed in.</p>
+            <button type="submit" class="w-full py-2.5 text-sm font-semibold rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors mt-2">Connect & Sync</button>
         </form>
     </div>
 </div>

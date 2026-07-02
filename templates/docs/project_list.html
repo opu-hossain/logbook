@@ -27,12 +27,20 @@
                 {{ project.get_sync_status_display }}
             </span>
         </div>
-        <p class="font-log text-xs text-gb-muted dark:text-gb-dark-muted">{{ project.github_full_name }}</p>
+        <div class="flex items-center gap-2 font-log text-xs text-gb-muted dark:text-gb-dark-muted">
+          <span>{{ project.github_full_name }}</span>
+          <span class="text-gb-border dark:text-gb-dark-border">·</span>
+          <span class="{% if project.is_public %}text-gb-green{% endif %}">{% if project.is_public %}Public{% else %}Private{% endif %}</span>
+        </div>
         {% if project.sync_error %}<p class="text-xs text-gb-red">{{ project.sync_error }}</p>{% endif %}
         <div class="flex items-center gap-2 mt-auto pt-3 border-t border-gb-border dark:border-gb-dark-border">
-            <a href="{% url 'project_docs_index' project.slug %}"
-                class="flex-1 text-center px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">View
-                Docs</a>
+          <a href="{% url 'project_docs_index' project.slug %}" class="flex-1 text-center px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">View Docs</a>
+          <form method="post" action="{% url 'project_toggle_visibility' project.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="px-3 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:border-gb-accent hover:text-gb-accent transition-colors">
+              {% if project.is_public %}Make Private{% else %}Make Public{% endif %}
+            </button>
+          </form>
             <form method="post" action="{% url 'project_sync' project.slug %}">
                 {% csrf_token %}
                 <button type="submit"
