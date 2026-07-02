@@ -4,6 +4,7 @@ import re
 import frontmatter
 import requests
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
 from .models import DocPage, Project
@@ -13,6 +14,18 @@ GITHUB_API = "https://api.github.com"
 
 class SyncError(Exception):
     """Raised for any recoverable sync failure — message is shown to the user."""
+
+
+def _github_headers(project):
+    try:
+        token = project.owner.github_account.token
+    except (AttributeError, ObjectDoesNotExist):
+        token = None
+
+    headers = {"Accept": "application/vnd.github+json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 def sync_project(project: Project) -> None:
@@ -45,14 +58,19 @@ def sync_project(project: Project) -> None:
 
 def _fetch_tree(project):
     url = f"{GITHUB_API}/repos/{project.github_owner}/{project.github_repo}/git/trees/{project.default_branch}"
-    resp = requests.get(url, params={"recursive": "1"}, timeout=15)
+    resp = requests.get(
+        url,
+        params={"recursive": "1"},
+        headers=_github_headers(project),
+        timeout=15,
+    )
     if resp.status_code == 404:
         raise SyncError(
-            "Repo or branch not found — check the owner/repo name and default branch."
+            "Repo or branch not found — check the owner/repo name, default branch, and GitHub access."
         )
     if resp.status_code == 403:
         raise SyncError(
-            "GitHub API rate limit hit (60 requests/hour for public access). Try again later."
+            "GitHub API access was denied or rate limited. Make sure your GitHub account is connected."
         )
     resp.raise_for_status()
     data = resp.json()
@@ -79,8 +97,13 @@ def _filter_docs_files(tree, docs_path):
 
 
 def _fetch_raw(project, path):
-    url = f"https://raw.githubusercontent.com/{project.github_owner}/{project.github_repo}/{project.default_branch}/{path}"
-    resp = requests.get(url, timeout=15)
+    url = f"{GITHUB_API}/repos/{project.github_owner}/{project.github_repo}/contents/{path}"
+    resp = requests.get(
+        url,
+        params={"ref": project.default_branch},
+        headers={**_github_headers(project), "Accept": "application/vnd.github.raw"},
+        timeout=15,
+    )
     if resp.status_code != 200:
         raise SyncError(f"Could not fetch {path} (HTTP {resp.status_code}).")
     return resp.text

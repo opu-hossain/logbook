@@ -16,6 +16,7 @@ class ProjectAdmin(admin.ModelAdmin):
         "name",
         "owner",
         "github_full_name",
+        "github_private",
         "sync_status",
         "last_synced_at",
     )

@@ -1,5 +1,3 @@
-import re
-
 from django import forms
 
 from .models import Project
@@ -10,20 +8,17 @@ INPUT_CLASS = (
     "focus:outline-none focus:border-gb-accent transition-colors"
 )
 
-GITHUB_URL_RE = re.compile(r"^https?://github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?/?$")
-
 
 class ProjectForm(forms.ModelForm):
-    repo_url = forms.URLField(
-        label="GitHub repository URL",
-        widget=forms.URLInput(
-            attrs={"placeholder": "https://github.com/owner/repo", "class": INPUT_CLASS}
-        ),
+    repo_full_name = forms.ChoiceField(
+        label="GitHub repository",
+        choices=(),
+        widget=forms.Select(attrs={"class": INPUT_CLASS}),
     )
 
     class Meta:
         model = Project
-        fields = ["name", "default_branch", "docs_path", "is_public"]
+        fields = ["name", "default_branch", "docs_path"]
         widgets = {
             "name": forms.TextInput(
                 attrs={
@@ -37,25 +32,50 @@ class ProjectForm(forms.ModelForm):
             "docs_path": forms.TextInput(
                 attrs={"placeholder": "docs", "class": INPUT_CLASS}
             ),
-            "is_public": forms.CheckboxInput(
-                attrs={"class": "w-4 h-4 rounded accent-gb-accent"}
-            ),
         }
 
-    def clean_repo_url(self):
-        url = self.cleaned_data["repo_url"].strip()
-        match = GITHUB_URL_RE.match(url)
-        if not match:
+    def __init__(self, *args, repositories=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.repositories = repositories or []
+        self.repository_map = {}
+
+        choices = [("", "Select one of your connected GitHub repositories")]
+        for repo in self.repositories:
+            full_name = repo["full_name"]
+            privacy_label = "private" if repo.get("private") else "public"
+            choices.append((full_name, f"{full_name} ({privacy_label})"))
+            self.repository_map[full_name] = repo
+
+        self.fields["repo_full_name"].choices = choices
+
+    def clean_repo_full_name(self):
+        full_name = self.cleaned_data["repo_full_name"]
+        if full_name not in self.repository_map:
             raise forms.ValidationError(
-                "Enter a GitHub repo URL, e.g. https://github.com/owner/repo"
+                "Select a repository from your connected GitHub account."
             )
-        return match.groups()
+        return full_name
+
+    def clean(self):
+        cleaned_data = super().clean()
+        full_name = cleaned_data.get("repo_full_name")
+        if not full_name:
+            return cleaned_data
+
+        repo = self.repository_map.get(full_name)
+        cleaned_data["_repo_data"] = repo
+        return cleaned_data
 
     def save(self, commit=True):
-        owner, repo = self.cleaned_data["repo_url"]
+        owner, repo = self.cleaned_data["repo_full_name"].split("/", 1)
+        repo_data = self.cleaned_data.get("_repo_data") or self.repository_map.get(
+            self.cleaned_data["repo_full_name"]
+        )
         instance = super().save(commit=False)
         instance.github_owner = owner
         instance.github_repo = repo
+        instance.github_private = bool(repo_data and repo_data.get("private"))
+        instance.is_public = False
         if commit:
             instance.save()
         return instance

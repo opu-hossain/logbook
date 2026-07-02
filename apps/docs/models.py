@@ -20,11 +20,15 @@ class Project(models.Model):
     slug = models.SlugField(max_length=100, unique=True)
     github_owner = models.CharField(max_length=200)
     github_repo = models.CharField(max_length=200)
+    github_private = models.BooleanField(
+        default=False,
+        help_text="True when the connected GitHub repository itself is private.",
+    )
     default_branch = models.CharField(max_length=100, default="main", blank=True)
     docs_path = models.CharField(max_length=200, default="docs", blank=True)
     is_public = models.BooleanField(
         default=False,
-        help_text="Public docs are viewable by anyone with the link. Private docs are visible only to you.",
+        help_text="Public docs are viewable by anyone with the link. Private docs are visible only to you. Private GitHub repos stay private.",
     )
     nav_tree = models.JSONField(default=list, blank=True)
     sync_status = models.CharField(
