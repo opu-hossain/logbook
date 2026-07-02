@@ -1,6 +1,6 @@
 ---
 title: Logbook Documentation
-order: 1
+order: 0
 ---
 
 # Welcome to Logbook
