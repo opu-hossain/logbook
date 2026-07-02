@@ -25,6 +25,7 @@
             </div>
 
             {% if request.user.is_authenticated %}
+            <a href="{% url 'project_list' %}" class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors {% if request.path|slice:':10' == '/projects/' %}text-gb-accent dark:text-gb-accent{% endif %}">Projects</a>
             <a href="{% url 'profile' %}" class="flex items-center gap-2 text-gb-text dark:text-gb-dark-text hover:text-gb-accent dark:hover:text-gb-accent transition-colors">
                 <span class="w-6 h-6 rounded-full bg-gb-accent flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
                     {{ request.user.get_full_name|first|upper|default:request.user.username|first|upper }}
@@ -103,6 +104,7 @@
         {% endif %}
 
         {% if request.user.is_authenticated %}
+        <a href="{% url 'project_list' %}" @click="open = false" class="text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors {% if request.path|slice:':10' == '/projects/' %}text-gb-accent{% endif %}">Projects</a>
         <a href="{% url 'profile' %}" @click="open = false" class="flex items-center gap-2 text-gb-text dark:text-gb-dark-text hover:text-gb-accent transition-colors">
             <span class="w-6 h-6 rounded-full bg-gb-accent flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
                 {{ request.user.get_full_name|first|upper|default:request.user.username|first|upper }}
