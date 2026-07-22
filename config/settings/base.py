@@ -8,8 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config("SECRET_KEY", default=os.environ.get("SECRET_KEY"))
 
 INSTALLED_APPS = [
-    # Cloudinary storage must be listed before staticfiles
-    "cloudinary_storage",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -17,6 +15,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "cloudinary",
+    "cloudinary_storage",
     "django.contrib.sitemaps",
     # apps
     "apps.accounts",
