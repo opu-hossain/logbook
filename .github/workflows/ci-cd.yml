@@ -1,0 +1,71 @@
+name: LogBook CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # CONTINUOUS INTEGRATION 
+  test-and-lint:
+    name: Build, Lint, and Test
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHONUNBUFFERED: "1"
+      SECRET_KEY: "ci-testing-secret-key-not-for-production"
+      DEBUG: "True"
+      # Dummy database URL for running migrations/tests in SQLite during CI
+      DATABASE_URL: "sqlite:///db.sqlite3"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache Pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Check code formatting and syntax (Linter)
+        run: |
+          ruff check .
+
+      - name: Run Django system checks
+        run: |
+          python manage.py check
+
+      - name: Verify database migrations
+        run: |
+          python manage.py makemigrations --check --dry-run
+
+      - name: Run Unit Tests
+        run: |
+          python manage.py test
+
+  # CONTINUOUS DEPLOYMENT
+  deploy:
+    name: Deploy to Render
+    needs: test-and-lint
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deployment
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
