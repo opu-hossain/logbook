@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.urls import translate_url
 from django.utils.text import slugify
 
 # Create your models here.
