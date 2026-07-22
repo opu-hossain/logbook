@@ -8,16 +8,22 @@ on:
 
 jobs:
   # CONTINUOUS INTEGRATION 
-  test-and-lint:
+test-and-lint:
     name: Build, Lint, and Test
     runs-on: ubuntu-latest
 
     env:
+      # Django Core
       PYTHONUNBUFFERED: "1"
-      SECRET_KEY: "ci-testing-secret-key-not-for-production"
       DEBUG: "True"
-      # Dummy database URL for running migrations/tests in SQLite during CI
       DATABASE_URL: "sqlite:///db.sqlite3"
+      SECRET_KEY: "ci-testing-secret-key-not-for-production"
+      
+      GITHUB_OAUTH_CLIENT_ID: "dummy-client-id"
+      GITHUB_OAUTH_CLIENT_SECRET: "dummy-client-secret"
+      GITHUB_TOKEN_ENCRYPTION_KEY: "dummy123456789012345678901234567890=" 
+      
+      CLOUDINARY_URL: "cloudinary://123456789012345:dummy-secret@dummy-cloud-name"
 
     steps:
       - name: Checkout repository
