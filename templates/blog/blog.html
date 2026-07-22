@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Blog — Logbook{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="mb-10 pb-6 border-b border-gb-border dark:border-gb-dark-border">
+  <p class="font-log text-xs text-gb-muted dark:text-gb-dark-muted uppercase tracking-widest mb-3">~/logbook/blog</p>
+  <h1 class="text-3xl font-bold text-gb-text dark:text-gb-dark-text">All Entries</h1>
+  <p class="text-gb-muted dark:text-gb-dark-muted mt-1 text-sm">Every post, latest first.</p>
+</div>
+
+<!-- Category filter -->
+{% if categories %}
+<div class="flex flex-wrap gap-2 mb-8">
+    <a href="/blog/"
+        class="font-log px-3 py-1 text-xs rounded-full border transition-colors
+        {% if not active_category %}border-gb-accent bg-gb-accent/10 text-gb-accent
+        {% else %}border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:border-gb-accent hover:text-gb-accent{% endif %}">all</a>
+    {% for category in categories %}
+    <a href="/blog/?category={{ category.slug }}"
+        class="font-log lowercase px-3 py-1 text-xs rounded-full border transition-colors
+        {% if active_category.slug == category.slug %}border-gb-accent bg-gb-accent/10 text-gb-accent
+        {% else %}border-gb-border dark:border-gb-dark-border text-gb-muted dark:text-gb-dark-muted hover:border-gb-accent hover:text-gb-accent{% endif %}">{{ category.name }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Post grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for post in page_obj %}
+    {% include "blog/post_card.html" %}
+    {% empty %}
+    <div class="col-span-full text-center py-20">
+      <p class="font-log text-gb-muted dark:text-gb-dark-muted text-sm">
+        {% if active_category %}no entries in "{{ active_category.name }}" yet.{% else %}no entries logged yet.{% endif %}
+      </p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="flex items-center justify-center gap-2 mt-12">
+
+    {% if page_obj.has_previous %}
+    <a href="?{% if active_category %}category={{ active_category.slug }}&{% endif %}page={{ page_obj.previous_page_number }}"
+        class="font-log px-3 py-2 text-xs rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">
+        ← prev
+    </a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.number == num %}
+    <span class="font-log px-3 py-2 text-xs rounded border border-gb-accent bg-gb-accent/10 text-gb-accent font-bold">
+        {{ num }}
+    </span>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+    <a href="?{% if active_category %}category={{ active_category.slug }}&{% endif %}page={{ num }}"
+        class="font-log px-3 py-2 text-xs rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">
+        {{ num }}
+    </a>
+    {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a href="?{% if active_category %}category={{ active_category.slug }}&{% endif %}page={{ page_obj.next_page_number }}"
+        class="font-log px-3 py-2 text-xs rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">
+        next →
+    </a>
+    {% endif %}
+
+</div>
+<p class="font-log text-center text-xs text-gb-muted dark:text-gb-dark-muted mt-4">page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+{% endif %}
+
+{% endblock %}

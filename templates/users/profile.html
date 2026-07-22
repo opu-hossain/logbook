@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}{{ request.user.username }} — Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8">
+
+    <!-- Avatar + Info -->
+    <div class="flex items-start gap-6 mb-10 pb-8 border-b border-gb-border dark:border-gb-dark-border">
+
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+            {% if request.user.avatar %}
+            <img src="{{ request.user.avatar.url }}" alt="{{ request.user.username }}"
+                class="w-20 h-20 rounded-full object-cover border-2 border-gb-accent" />
+            {% else %}
+            <div
+                class="w-20 h-20 rounded-full bg-gb-accent flex items-center justify-center text-2xl font-bold text-white">
+                {{ request.user.get_full_name|first|upper|default:request.user.username|first|upper }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1">
+            <h1 class="text-2xl font-bold text-gb-text dark:text-gb-dark-text">
+                {{request.user.get_full_name|default:request.user.username }}</h1>
+            <p class="text-gb-muted dark:text-gb-dark-muted text-sm mt-0.5">@{{ request.user.username }}</p>
+            {% if request.user.bio %}
+            <p class="text-gb-text dark:text-gb-dark-text text-sm mt-3 leading-relaxed">{{ request.user.bio }}</p>
+            {% else %}
+            <p class="text-gb-muted dark:text-gb-dark-muted text-sm mt-3 italic">No bio yet.</p>
+            {% endif %}
+            <div class="mt-4 flex items-center gap-3">
+                <a href="{% url 'profile_edit' %}"
+                    class="px-4 py-1.5 text-xs font-medium rounded border border-gb-accent text-gb-accent hover:bg-gb-accent hover:text-white transition-colors">Edit
+                    Profile</a>
+                {% if request.user.github_account %}
+                <span class="flex items-center gap-2 text-xs text-gb-muted dark:text-gb-dark-muted">
+                    <span class="text-gb-green">●</span> GitHub: @{{ request.user.github_account.github_username }}
+                    <a href="{% url 'github_disconnect' %}" class="text-gb-red hover:underline">Disconnect</a>
+                </span>
+                {% else %}
+                <a href="{% url 'github_connect' %}"
+                    class="px-4 py-1.5 text-xs font-medium rounded border border-gb-border dark:border-gb-dark-border text-gb-text dark:text-gb-dark-text hover:border-gb-accent hover:text-gb-accent transition-colors">Connect
+                    GitHub</a>
+                {% endif %}
+            </div>
+
+            {% if request.user.github_account %}
+            <div class="mt-6 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface p-4">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <h2 class="text-sm font-semibold text-gb-text dark:text-gb-dark-text">GitHub Repositories</h2>
+                    <span class="text-xs text-gb-muted dark:text-gb-dark-muted">Owned repos available through your OAuth token</span>
+                </div>
+                {% if github_repositories %}
+                <div class="space-y-3">
+                    {% for repo in github_repositories %}
+                    <a href="{{ repo.html_url }}" target="_blank" rel="noopener noreferrer"
+                        class="block rounded border border-gb-border dark:border-gb-dark-border p-3 hover:border-gb-accent transition-colors">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-medium text-gb-text dark:text-gb-dark-text">{{ repo.full_name }}</p>
+                                {% if repo.description %}
+                                <p class="text-xs text-gb-muted dark:text-gb-dark-muted mt-1">{{ repo.description }}</p>
+                                {% endif %}
+                            </div>
+                            <span class="text-xs px-2 py-1 rounded {% if repo.private %}bg-gb-red/10 text-gb-red{% else %}bg-gb-green/10 text-gb-green{% endif %}">
+                                {% if repo.private %}Private{% else %}Public{% endif %}
+                            </span>
+                        </div>
+                        <div class="mt-2 text-xs text-gb-muted dark:text-gb-dark-muted flex items-center gap-4">
+                            <span>Default branch: {{ repo.default_branch }}</span>
+                            <span>Open on GitHub</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gb-muted dark:text-gb-dark-muted">No owned repositories were returned from GitHub.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+<!-- Comments -->
+    <div class="mb-10">
+        <h2 class="text-lg font-bold text-gb-text dark:text-gb-dark-text mb-4">My Comments ({{ comments.count }})</h2>
+        {% if comments %}
+        <div class="flex flex-col gap-4">
+            {% for comment in comments %}
+            <div
+                class="p-4 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface">
+                <p class="text-sm text-gb-text dark:text-gb-dark-text leading-relaxed">{{ comment.body }}</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="text-xs text-gb-muted dark:text-gb-dark-muted">On</span>
+                    <a href="{% url 'post_detail' comment.post.slug %}"
+                        class="text-xs text-gb-accent hover:text-gb-accent-hover transition-colors">
+                        {{comment.post.title}}</a>
+                    <span class="text-xs text-gb-muted dark:text-gb-dark-muted">·
+                        {{ comment.created_at|date:"M j, Y"}}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gb-muted dark:text-gb-dark-muted text-sm">No comments yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

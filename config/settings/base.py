@@ -18,8 +18,9 @@ INSTALLED_APPS = [
     "cloudinary_storage",
     "django.contrib.sitemaps",
     # apps
-    "apps.accounts",
+    "apps.users",
     "apps.blog",
+    "apps.docs",
     "taggit",
     "markdownx",
     "markdownify.apps.MarkdownifyConfig",
@@ -65,7 +66,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "users.User"
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Dhaka"
@@ -90,6 +91,12 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# GitHub OAuth (apps.users "Connect GitHub" + apps.docs ownership checks)
+GITHUB_OAUTH_CLIENT_ID = config("GITHUB_OAUTH_CLIENT_ID")
+GITHUB_OAUTH_CLIENT_SECRET = config("GITHUB_OAUTH_CLIENT_SECRET")
+GITHUB_OAUTH_REDIRECT_URI = config("GITHUB_OAUTH_REDIRECT_URI", default="")
+GITHUB_TOKEN_ENCRYPTION_KEY = config("GITHUB_TOKEN_ENCRYPTION_KEY")
 
 MARKDOWNX_EDITOR_RESIZABLE = False
 
@@ -130,6 +137,12 @@ MARKDOWNIFY = {
             "tr",
             "th",
             "td",
+        ],
+        "WHITELIST_ATTRS": [
+            "href",
+            "title",
+            "src",
+            "alt",
         ],
     }
 }

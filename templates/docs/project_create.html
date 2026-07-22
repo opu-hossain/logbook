@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Connect a Repository — Logbook{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6">
+        <div class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-8">
+            <h1 class="text-xl font-bold text-gb-text dark:text-gb-dark-text mb-1">Connect a Repository</h1>
+            <p class="text-sm text-gb-muted dark:text-gb-dark-muted mb-6">Choose from repositories owned by your connected GitHub account. New projects start private, and you can change visibility later from the projects list.</p>
+
+            {% if owned_repositories %}
+            <form method="post" class="flex flex-col gap-4">
+                {% csrf_token %}
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">{{ form.repo_full_name.label }}</label>
+                    {{ form.repo_full_name }}
+                    {% if form.repo_full_name.errors %}<p class="text-xs text-gb-red">{{ form.repo_full_name.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Project Name <span class="text-gb-muted dark:text-gb-dark-muted font-normal">(optional)</span></label>
+                    {{ form.name }}
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Branch</label>
+                        {{ form.default_branch }}
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-gb-text dark:text-gb-dark-text">Docs Path</label>
+                        {{ form.docs_path }}
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 text-sm font-semibold rounded bg-gb-accent text-white hover:bg-gb-accent-hover transition-colors mt-2">Connect & Sync</button>
+            </form>
+            {% else %}
+            <div class="rounded border border-gb-border dark:border-gb-dark-border bg-gb-bg dark:bg-gb-dark-bg p-4">
+                <p class="text-sm text-gb-muted dark:text-gb-dark-muted">No owned repositories were returned from GitHub.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-gb-surface dark:bg-gb-dark-surface border border-gb-border dark:border-gb-dark-border rounded-lg p-8">
+            <h2 class="text-base font-semibold text-gb-text dark:text-gb-dark-text mb-3">How visibility works</h2>
+            <div class="space-y-3 text-sm text-gb-muted dark:text-gb-dark-muted leading-relaxed">
+                <p>All new projects start private in Logbook.</p>
+                <p>You can change visibility later from the projects list page.</p>
+                <p>Only repositories owned by your connected GitHub account appear here.</p>
+            </div>
+            <div class="mt-6 rounded border border-gb-border dark:border-gb-dark-border p-4">
+                <p class="text-xs uppercase tracking-widest font-log text-gb-muted dark:text-gb-dark-muted mb-2">Rule</p>
+                <p class="text-sm text-gb-text dark:text-gb-dark-text">Visibility changes happen only from the projects list. Private GitHub repositories stay private in Logbook.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

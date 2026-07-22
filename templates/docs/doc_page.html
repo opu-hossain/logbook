@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load markdownify %}
+{% block title %}{{ page.title }} — {{ project.name }} — Logbook{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-x-10" x-data="{ navOpen: false }">
+
+  <!-- Mobile nav toggle -->
+  <button @click="navOpen = !navOpen" type="button"
+    class="lg:hidden w-full flex items-center justify-between px-4 py-3 mb-4 rounded border border-gb-border dark:border-gb-dark-border bg-gb-surface dark:bg-gb-dark-surface text-sm font-medium text-gb-text dark:text-gb-dark-text">
+    <span class="font-log text-xs uppercase tracking-widest text-gb-muted dark:text-gb-dark-muted">{{ project.name }} docs</span>
+    <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': navOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <aside :class="navOpen ? 'block' : 'hidden'"
+    class="lg:!block lg:sticky lg:top-24 self-start mb-8 lg:mb-0 lg:max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
+    {% include "docs/nav_tree.html" with nodes=project.nav_tree project_slug=project.slug active_slug=page.slug_path top=True %}
+  </aside>
+
+  <article class="min-w-0 prose max-w-none
+    prose-headings:text-gb-text dark:prose-headings:text-gb-dark-text
+    prose-p:text-gb-text dark:prose-p:text-gb-dark-text
+    prose-strong:text-gb-text dark:prose-strong:text-gb-dark-text
+    prose-a:text-gb-accent
+    prose-blockquote:text-gb-muted dark:prose-blockquote:text-gb-dark-muted
+    prose-blockquote:border-gb-accent
+    prose-code:text-gb-yellow
+    prose-pre:bg-gb-dark-surface dark:prose-pre:bg-gb-dark-surface
+    prose-pre:overflow-x-auto
+    prose-li:text-gb-text dark:prose-li:text-gb-dark-text
+    prose-th:text-gb-text dark:prose-th:text-gb-dark-text
+    prose-td:text-gb-text dark:prose-td:text-gb-dark-text">
+    <h1>{{ page.title }}</h1>
+    {{ page.raw_markdown|markdownify }}
+  </article>
+</div>
+{% endblock %}

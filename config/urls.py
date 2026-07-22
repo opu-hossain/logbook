@@ -23,7 +23,12 @@ from django.contrib.sitemaps.views import sitemap
 from django.contrib.auth import views as auth_views
 
 from apps.blog.feeds import LatestPostsFeed
-from apps.blog.views import home, post_detail, blog, search
+from apps.blog.views import (
+    home,
+    post_detail,
+    blog,
+    search,
+)
 from apps.blog.sitemaps import PostSitemap
 
 sitemaps = {"posts": PostSitemap}
@@ -36,7 +41,8 @@ urlpatterns = [
     path("post/<slug:slug>/", post_detail, name="post_detail"),
     path("search/", search, name="search"),
     path("feed/", LatestPostsFeed(), name="feed"),
-    path("auth/", include("apps.accounts.urls")),
+    path("user/", include("apps.users.urls")),
+    path("projects/", include("apps.docs.urls")),
     # [sitemap-path]
     path(
         "sitemap.xml",
@@ -47,30 +53,28 @@ urlpatterns = [
     # [email]
     # [password reset path's]
     path(
-        "auth/password-reset/",
-        auth_views.PasswordResetView.as_view(
-            template_name="accounts/password_reset.html"
-        ),
+        "user/password-reset/",
+        auth_views.PasswordResetView.as_view(template_name="users/password_reset.html"),
         name="password_reset",
     ),
     path(
-        "auth/password-reset/done/",
+        "user/password-reset/done/",
         auth_views.PasswordResetDoneView.as_view(
-            template_name="accounts/password_reset_done.html"
+            template_name="users/password_reset_done.html"
         ),
         name="password_reset_done",
     ),
     path(
-        "auth/password-reset/confirm/<uidb64>/<token>/",
+        "user/password-reset/confirm/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
-            template_name="accounts/password_reset_confirm.html"
+            template_name="users/password_reset_confirm.html"
         ),
         name="password_reset_confirm",
     ),
     path(
-        "auth/password-reset/complete/",
+        "user/password-reset/complete/",
         auth_views.PasswordResetCompleteView.as_view(
-            template_name="accounts/password_reset_complete.html"
+            template_name="users/password_reset_complete.html"
         ),
         name="password_reset_complete",
     ),

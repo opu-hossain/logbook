@@ -1,6 +1,5 @@
-from logging import PlaceHolder
 from django import forms
-from .models import Comment
+from .models import Comment, Post, Category
 
 
 class CommentForm(forms.ModelForm):
