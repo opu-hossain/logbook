@@ -76,7 +76,7 @@ class GitHubConnectViewTests(TestCase):
             }
         ]
 
-        account = GitHubAccount.objects.create(
+        GitHubAccount.objects.create(
             user=self.user,
             github_id=123,
             github_username="alice",
@@ -84,7 +84,9 @@ class GitHubConnectViewTests(TestCase):
             scope="repo",
         )
 
-        with patch.object(GitHubAccount, "token", new_callable=PropertyMock) as mock_token:
+        with patch.object(
+            GitHubAccount, "token", new_callable=PropertyMock
+        ) as mock_token:
             mock_token.return_value = "test-token"
             response = self.client.get(reverse("profile"))
 
